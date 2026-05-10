@@ -1,0 +1,185 @@
+{
+  "info": {
+    "_postman_id": "9f9142fd-bbad-47d5-bf14-4da62d915408",
+    "name": "Menu_Gap",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37208924"
+  },
+  "item": [
+    {
+      "name": "login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();",
+              "",
+              "if (response.token) {",
+              "    pm.environment.set(\"menu_auth_token\", response.token);",
+              "    console.log(\"Auth token saved:\", response.token);",
+              "}",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"user\": {\"email\": \"banoffee@menugap.com\", \"password\": \"password123\"}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Intelligence",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJmOTk1NTI3OC01YzBmLTQzYjctOTRmOS01YjA3YWJlZmUyNzQiLCJzdWIiOiIxIiwic2NwIjoidXNlciIsImF1ZCI6bnVsbCwiaWF0IjoxNzc4MzY4NjczLCJleHAiOjE3Nzg5NzM0NzN9.1b4sWvMbrHTuZS6OHYGRCaFcDHGUeVr84RR56LAket0",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer <your_token_here>"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/cafes/1/intelligence",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "cafes",
+            "1",
+            "intelligence"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get session Id",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{menu_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer TOKEN"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/cafes/1/chat_sessions",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "cafes",
+            "1",
+            "chat_sessions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "chat",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{menu_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer TOKEN"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": 7,\n    \"message\": \"What is my worst performing item and what should I do about it?\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/cafes/1/chat",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "cafes",
+            "1",
+            "chat"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
