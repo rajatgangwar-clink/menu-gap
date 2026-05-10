@@ -4,94 +4,129 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ───────────────────────────────────────────────────────────────────────────
+   Aurora Glass — dark immersive palette
+   The whole product runs in a permanently dark aesthetic with translucent
+   "glass" cards layered over an animated aurora gradient. Light-mode tokens
+   below mirror the dark ones so any component that reads :root values still
+   gets the dark palette without conditional logic.
+   ─────────────────────────────────────────────────────────────────────────── */
 :root {
   --font-size: 16px;
-  --background: #f4f5fa;
-  --foreground: #1e1b3a;
-  --card: #ffffff;
-  --card-foreground: #1e1b3a;
-  --popover: #ffffff;
-  --popover-foreground: #1e1b3a;
-  --primary: #4f46e5;
+
+  /* Deep aurora canvas */
+  --background: #06070f;
+  --foreground: #f5f6ff;
+
+  /* Glass surface — used by Card components, sidebar, headers */
+  --card: rgba(255, 255, 255, 0.04);
+  --card-foreground: #f5f6ff;
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-glow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 12px 32px -12px rgba(0, 0, 0, 0.6);
+
+  --popover: #11122a;
+  --popover-foreground: #f5f6ff;
+
+  --primary: #8b5cf6;
   --primary-foreground: #ffffff;
-  --secondary: #f1f2f8;
-  --secondary-foreground: #1e1b3a;
-  --muted: #f1f2f8;
-  --muted-foreground: #6b7280;
-  --accent: #eef2ff;
-  --accent-foreground: #1e1b3a;
-  --destructive: #ef4444;
+
+  --secondary: rgba(255, 255, 255, 0.06);
+  --secondary-foreground: #f5f6ff;
+
+  --muted: rgba(255, 255, 255, 0.05);
+  --muted-foreground: #a4a8c5;
+
+  --accent: rgba(139, 92, 246, 0.14);
+  --accent-foreground: #f5f6ff;
+
+  --destructive: #f43f5e;
   --destructive-foreground: #ffffff;
-  --border: rgba(30, 27, 58, 0.08);
+
+  --border: rgba(255, 255, 255, 0.08);
   --input: transparent;
-  --input-background: #f7f8fc;
-  --switch-background: #e5e7eb;
+  --input-background: rgba(255, 255, 255, 0.04);
+  --switch-background: rgba(255, 255, 255, 0.12);
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #4f46e5;
-  --chart-1: #4f46e5;
-  --chart-2: #10b981;
-  --chart-3: #06b6d4;
-  --chart-4: #f59e0b;
-  --chart-5: #8b5cf6;
+  --ring: #a78bfa;
+
+  /* Chart palette tuned for dark backgrounds */
+  --chart-1: #a78bfa;
+  --chart-2: #34d399;
+  --chart-3: #38bdf8;
+  --chart-4: #fbbf24;
+  --chart-5: #f472b6;
+
   --radius: 1rem;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #1e1b3a;
-  --sidebar-primary: #4f46e5;
+
+  /* Sidebar mirrors card — translucent glass over the aurora */
+  --sidebar: rgba(10, 12, 28, 0.55);
+  --sidebar-foreground: #f5f6ff;
+  --sidebar-primary: #8b5cf6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eef2ff;
-  --sidebar-accent-foreground: #1e1b3a;
-  --sidebar-border: rgba(30, 27, 58, 0.08);
-  --sidebar-ring: #4f46e5;
-  --status-positive: #d1fae5;
-  --status-positive-foreground: #065f46;
-  --status-caution: #fef3c7;
-  --status-caution-foreground: #92400e;
-  --status-negative: #ffe4e6;
-  --status-negative-foreground: #9f1239;
+  --sidebar-accent: rgba(139, 92, 246, 0.16);
+  --sidebar-accent-foreground: #f5f6ff;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #a78bfa;
+
+  /* Status pills on dark glass */
+  --status-positive: rgba(16, 185, 129, 0.18);
+  --status-positive-foreground: #6ee7b7;
+  --status-caution: rgba(245, 158, 11, 0.18);
+  --status-caution-foreground: #fcd34d;
+  --status-negative: rgba(244, 63, 94, 0.2);
+  --status-negative-foreground: #fda4af;
+
+  /* Brand gradient stops used across heroes / accents */
+  --aurora-violet: #6d28d9;
+  --aurora-indigo: #4338ca;
+  --aurora-cyan: #06b6d4;
+  --aurora-pink: #db2777;
 }
 
+/* Mirror the dark palette here so toggling `.dark` is a no-op — the whole app
+   is always dark. */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --input-background: oklch(0.269 0 0);
-  --switch-background: oklch(0.269 0 0);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-  --status-positive: oklch(0.396 0.141 162.48);
-  --status-positive-foreground: oklch(0.985 0 0);
-  --status-caution: oklch(0.396 0.141 70.08);
-  --status-caution-foreground: oklch(0.985 0 0);
-  --status-negative: oklch(0.396 0.141 22.216);
-  --status-negative-foreground: oklch(0.985 0 0);
+  --background: #06070f;
+  --foreground: #f5f6ff;
+  --card: rgba(255, 255, 255, 0.04);
+  --card-foreground: #f5f6ff;
+  --popover: #11122a;
+  --popover-foreground: #f5f6ff;
+  --primary: #8b5cf6;
+  --primary-foreground: #ffffff;
+  --secondary: rgba(255, 255, 255, 0.06);
+  --secondary-foreground: #f5f6ff;
+  --muted: rgba(255, 255, 255, 0.05);
+  --muted-foreground: #a4a8c5;
+  --accent: rgba(139, 92, 246, 0.14);
+  --accent-foreground: #f5f6ff;
+  --destructive: #f43f5e;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.06);
+  --input-background: rgba(255, 255, 255, 0.04);
+  --switch-background: rgba(255, 255, 255, 0.12);
+  --ring: #a78bfa;
+  --chart-1: #a78bfa;
+  --chart-2: #34d399;
+  --chart-3: #38bdf8;
+  --chart-4: #fbbf24;
+  --chart-5: #f472b6;
+  --sidebar: rgba(10, 12, 28, 0.55);
+  --sidebar-foreground: #f5f6ff;
+  --sidebar-primary: #8b5cf6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(139, 92, 246, 0.16);
+  --sidebar-accent-foreground: #f5f6ff;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #a78bfa;
+  --status-positive: rgba(16, 185, 129, 0.18);
+  --status-positive-foreground: #6ee7b7;
+  --status-caution: rgba(245, 158, 11, 0.18);
+  --status-caution-foreground: #fcd34d;
+  --status-negative: rgba(244, 63, 94, 0.2);
+  --status-negative-foreground: #fda4af;
 }
 
 @theme inline {
@@ -160,6 +195,10 @@
     display: none;
   }
 
+  html, body {
+    color-scheme: dark;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -196,5 +235,106 @@
     font-size: 1rem;
     font-weight: 600;
     line-height: 1.5;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Animations — ambient & gentle
+   ─────────────────────────────────────────────────────────────────────────── */
+@keyframes aurora-drift {
+  0%   { transform: translate3d(-6%, -4%, 0) rotate(0deg) scale(1.05); }
+  50%  { transform: translate3d( 4%,  6%, 0) rotate(8deg) scale(1.15); }
+  100% { transform: translate3d(-6%, -4%, 0) rotate(0deg) scale(1.05); }
+}
+
+@keyframes aurora-drift-slow {
+  0%   { transform: translate3d(8%, 6%, 0) scale(1.1); }
+  50%  { transform: translate3d(-6%, -8%, 0) scale(1.2); }
+  100% { transform: translate3d(8%, 6%, 0) scale(1.1); }
+}
+
+@keyframes fade-rise {
+  0%   { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.0); }
+  50%      { box-shadow: 0 0 36px -6px rgba(167, 139, 250, 0.35); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes blob-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(20px, -16px) scale(1.05); }
+}
+
+.aurora-drift   { animation: aurora-drift 24s ease-in-out infinite; }
+.aurora-drift-2 { animation: aurora-drift-slow 32s ease-in-out infinite; }
+.fade-rise      { animation: fade-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.glow-pulse     { animation: glow-pulse 4.5s ease-in-out infinite; }
+.blob-float     { animation: blob-float 14s ease-in-out infinite; }
+
+.shimmer-text {
+  background-image: linear-gradient(
+    90deg,
+    rgba(245, 246, 255, 0.6) 0%,
+    rgba(245, 246, 255, 1) 50%,
+    rgba(245, 246, 255, 0.6) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+
+/* Reusable glass surface — translucent, blurred, faintly bordered */
+.glass {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: var(--card-glow);
+}
+
+.glass-strong {
+  background: rgba(20, 22, 44, 0.5);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  box-shadow: var(--card-glow);
+}
+
+/* Hover lift — used on interactive cards */
+.hover-lift {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.4s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  border-color: rgba(167, 139, 250, 0.35);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset,
+              0 24px 48px -16px rgba(76, 29, 149, 0.45),
+              0 0 0 1px rgba(167, 139, 250, 0.2);
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-drift,
+  .aurora-drift-2,
+  .fade-rise,
+  .glow-pulse,
+  .blob-float,
+  .shimmer-text {
+    animation: none !important;
+  }
+  .hover-lift {
+    transition: none;
   }
 }

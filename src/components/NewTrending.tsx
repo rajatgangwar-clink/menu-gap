@@ -28,6 +28,9 @@ import { PageHeader } from "@/components/PageHeader";
 import type { DashboardData, TrendingItem } from "@/lib/types";
 import { Pill } from "@/components/ui-extras/Badges";
 import { MenuCoverageDonut } from "@/components/widgets/MenuCoverageDonut";
+import { GlassCard } from "@/components/ui-extras/GlassCard";
+import { Reveal } from "@/components/ui-extras/Reveal";
+import { CountUp } from "@/components/ui-extras/CountUp";
 
 export function NewTrending() {
   const { data, loading, error, refetch } = useDashboard();
@@ -67,41 +70,51 @@ function TrendingContent({ data }: { data: DashboardData }) {
       <div className="p-6 space-y-6">
         <PageHeader title="Trending" subtitle="Local trending dishes in HSR Layout" />
 
-        <TrendingStatsRow
-          total={totalTrending}
-          served={servedCount}
-          coverage={coverage}
-          avgScore={avgScore}
-          topRising={topRising}
-        />
+        <Reveal delay={80}>
+          <TrendingStatsRow
+            total={totalTrending}
+            served={servedCount}
+            coverage={coverage}
+            avgScore={avgScore}
+            topRising={topRising}
+          />
+        </Reveal>
 
         <div className="grid grid-cols-3 gap-6">
           {topRising && (
-            <div className="col-span-2">
+            <Reveal delay={220} className="col-span-2">
               <TrendingHero dish={topRising} />
-            </div>
+            </Reveal>
           )}
           <div className="col-span-1 grid grid-rows-2 gap-6">
-            {topDeclining && <CompactTrendCard dish={topDeclining} variant="cooling" />}
-            <CompactTrendCard
-              variant="hottest"
-              dish={topRising}
-              servedCount={servedCount}
-              total={totalTrending}
-            />
+            {topDeclining && (
+              <Reveal delay={300}>
+                <CompactTrendCard dish={topDeclining} variant="cooling" />
+              </Reveal>
+            )}
+            <Reveal delay={360}>
+              <CompactTrendCard
+                variant="hottest"
+                dish={topRising}
+                servedCount={servedCount}
+                total={totalTrending}
+              />
+            </Reveal>
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-6 items-start">
-          <div className="col-span-2">
+          <Reveal delay={420} className="col-span-2">
             <TrendingList title="Rising in Your Area" items={rising} tone="positive" />
-          </div>
-          <div className="col-span-1">
+          </Reveal>
+          <Reveal delay={480} className="col-span-1">
             <MenuCoverageDonut data={data} />
-          </div>
+          </Reveal>
         </div>
 
-        <TrendingList title="Cooling Off" items={declining} tone="negative" fullWidth />
+        <Reveal delay={540}>
+          <TrendingList title="Cooling Off" items={declining} tone="negative" fullWidth />
+        </Reveal>
       </div>
     </div>
   );
@@ -127,90 +140,133 @@ function TrendingStatsRow({
   return (
     <div className="grid grid-cols-4 gap-4">
       <KpiCard
-        dotColor="bg-indigo-500"
-        icon={
-          <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">
-            <Layers className="w-5 h-5 text-indigo-600" />
-          </div>
-        }
+        accent="violet"
+        icon={<Layers className="w-5 h-5" />}
         label="Tracked"
-        value={total.toString()}
+        value={total}
+        delay={100}
         caption="trending dishes locally"
       />
       <KpiCard
-        dotColor="bg-emerald-500"
-        icon={
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-          </div>
-        }
+        accent="emerald"
+        icon={<CheckCircle2 className="w-5 h-5" />}
         label="Coverage"
-        value={`${coverage}%`}
+        value={coverage}
+        delay={180}
+        format={(v) => `${Math.round(v)}%`}
         caption={`${served} of ${total} on your menu`}
       />
       <KpiCard
-        dotColor="bg-amber-500"
-        icon={
-          <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center">
-            <Activity className="w-5 h-5 text-amber-600" />
-          </div>
-        }
+        accent="amber"
+        icon={<Activity className="w-5 h-5" />}
         label="Avg trend score"
-        value={total ? avgScore.toString() : "—"}
+        value={total ? avgScore : 0}
+        empty={!total}
+        delay={260}
         caption="across tracked dishes"
       />
       <KpiCard
-        dotColor="bg-rose-500"
-        icon={
-          <div className="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center">
-            <Flame className="w-5 h-5 text-rose-600" />
-          </div>
-        }
+        accent="rose"
+        icon={<Flame className="w-5 h-5" />}
         label="Hottest dish"
-        value={topRising ? Math.round(topRising.trendScore * 100).toString() : "—"}
+        value={topRising ? Math.round(topRising.trendScore * 100) : 0}
+        empty={!topRising}
+        delay={340}
         caption={topRising ? topRising.name : "no data"}
       />
     </div>
   );
 }
 
+const KPI_ACCENT: Record<
+  "violet" | "amber" | "emerald" | "rose",
+  { dot: string; iconBg: string; iconColor: string; glow: string; bar: string }
+> = {
+  violet: {
+    dot: "bg-violet-400 shadow-[0_0_12px] shadow-violet-500/60",
+    iconBg: "bg-violet-500/15 border-violet-400/25",
+    iconColor: "text-violet-300",
+    glow: "bg-violet-500",
+    bar: "from-violet-400 to-fuchsia-400",
+  },
+  amber: {
+    dot: "bg-amber-400 shadow-[0_0_12px] shadow-amber-500/60",
+    iconBg: "bg-amber-500/15 border-amber-400/25",
+    iconColor: "text-amber-300",
+    glow: "bg-amber-500",
+    bar: "from-amber-400 to-orange-400",
+  },
+  emerald: {
+    dot: "bg-emerald-400 shadow-[0_0_12px] shadow-emerald-500/60",
+    iconBg: "bg-emerald-500/15 border-emerald-400/25",
+    iconColor: "text-emerald-300",
+    glow: "bg-emerald-500",
+    bar: "from-emerald-400 to-cyan-400",
+  },
+  rose: {
+    dot: "bg-rose-400 shadow-[0_0_12px] shadow-rose-500/60",
+    iconBg: "bg-rose-500/15 border-rose-400/25",
+    iconColor: "text-rose-300",
+    glow: "bg-rose-500",
+    bar: "from-rose-400 to-fuchsia-400",
+  },
+};
+
 function KpiCard({
-  dotColor,
+  accent,
   icon,
   label,
   value,
   caption,
+  format,
+  empty = false,
+  delay = 0,
 }: {
-  dotColor: string;
+  accent: "violet" | "amber" | "emerald" | "rose";
   icon: React.ReactNode;
   label: string;
-  value: string;
+  value: number;
   caption?: string;
+  format?: (v: number) => string;
+  empty?: boolean;
+  delay?: number;
 }) {
+  const cfg = KPI_ACCENT[accent];
   return (
-    <div className="bg-card rounded-2xl border border-border p-5">
-      <div className="flex items-center gap-2 mb-3">
-        <span className={`w-2 h-2 rounded-full ${dotColor}`} />
+    <GlassCard interactive className="relative p-5 overflow-hidden">
+      <div
+        aria-hidden
+        className={`absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-25 ${cfg.glow}`}
+      />
+      <div className="relative flex items-center gap-2 mb-3">
+        <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
         <span
-          className="text-xs uppercase tracking-wider text-muted-foreground"
+          className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
           style={{ fontWeight: 600 }}
         >
           {label}
         </span>
-        <div className="ml-auto">{icon}</div>
+        <div
+          className={`ml-auto w-9 h-9 rounded-xl flex items-center justify-center border ${cfg.iconBg} ${cfg.iconColor}`}
+        >
+          {icon}
+        </div>
       </div>
-      <div className="text-3xl tracking-tight" style={{ fontWeight: 700 }}>
-        {value}
+      <div className="relative text-3xl tracking-tight" style={{ fontWeight: 800 }}>
+        {empty ? "—" : <CountUp to={value} format={format} delay={delay} />}
       </div>
       {caption && (
         <div
-          className="text-sm text-muted-foreground mt-1.5 truncate"
+          className="relative text-sm text-muted-foreground mt-1.5 truncate"
           style={{ fontWeight: 500 }}
         >
           {caption}
         </div>
       )}
-    </div>
+      <div className="relative mt-3 h-0.5 rounded-full bg-white/[0.06] overflow-hidden">
+        <div className={`h-full w-2/3 rounded-full bg-gradient-to-r ${cfg.bar}`} />
+      </div>
+    </GlassCard>
   );
 }
 
@@ -220,26 +276,53 @@ function KpiCard({
 
 function TrendingHero({ dish }: { dish: TrendingItem }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/30 bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-400 text-white p-8 h-full">
-      <DecorBlobs />
+    <div className="relative overflow-hidden rounded-2xl border border-white/10 text-white p-8 h-full glow-pulse">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#1e1b4b] via-[#7c2d12] to-[#831843]" />
+      <div
+        className="absolute -top-24 -right-24 w-80 h-80 rounded-full opacity-60 blur-3xl blob-float"
+        style={{
+          background: "radial-gradient(circle, rgba(251, 146, 60, 0.55), transparent 65%)",
+        }}
+      />
+      <div
+        className="absolute -bottom-32 -left-12 w-96 h-96 rounded-full opacity-50 blur-3xl blob-float"
+        style={{
+          background: "radial-gradient(circle, rgba(217, 70, 239, 0.5), transparent 65%)",
+          animationDelay: "-7s",
+        }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-[0.08]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+
       <div className="relative flex flex-col h-full justify-between gap-8">
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-white/15">
+            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm border border-white/20">
               <Flame className="w-4 h-4" />
             </div>
             <span
-              className="text-xs uppercase tracking-[0.15em] opacity-90"
-              style={{ fontWeight: 600 }}
+              className="text-[11px] uppercase tracking-[0.2em] opacity-90"
+              style={{ fontWeight: 700 }}
             >
               Hottest right now
             </span>
           </div>
           <div>
-            <h2 className="text-5xl leading-[1.05] mb-3 tracking-tight" style={{ fontWeight: 700 }}>
+            <h2
+              className="text-6xl leading-[1.0] mb-3 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-amber-100 to-fuchsia-200"
+              style={{ fontWeight: 800 }}
+            >
               {dish.name}
             </h2>
-            <p className="text-base opacity-90 max-w-xl">
+            <p className="text-base opacity-80 max-w-xl">
               {dish.servedByCafe
                 ? "You already serve this — keep riding the wave."
                 : "Highest-momentum dish in your area, missing from your menu."}
@@ -249,12 +332,13 @@ function TrendingHero({ dish }: { dish: TrendingItem }) {
 
         <div className="grid grid-cols-3 gap-3">
           <HeroStat
-            value={Math.round(dish.trendScore * 100).toString()}
+            value={Math.round(dish.trendScore * 100)}
             unit="/ 100"
             label="Trend Score"
+            delay={500}
           />
-          <HeroStat value={capitalize(dish.direction)} label="Direction" />
-          <HeroStat
+          <HeroStatText value={capitalize(dish.direction)} label="Direction" />
+          <HeroStatText
             value={dish.servedByCafe ? "Yes" : "No"}
             label={dish.servedByCafe ? "On Your Menu" : "Gap to Close"}
           />
@@ -262,11 +346,11 @@ function TrendingHero({ dish }: { dish: TrendingItem }) {
 
         <button
           type="button"
-          className="self-start inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-primary text-sm hover:bg-white/90 transition-colors shadow-lg shadow-black/10"
-          style={{ fontWeight: 600 }}
+          className="group self-start inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/95 text-violet-900 text-sm hover:bg-white transition-all shadow-lg shadow-black/20 hover:scale-[1.02]"
+          style={{ fontWeight: 700 }}
         >
           {dish.servedByCafe ? "View performance" : "Plan addition"}
-          <ArrowUpRight className="w-4 h-4" />
+          <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </button>
       </div>
     </div>
@@ -277,35 +361,40 @@ function HeroStat({
   value,
   unit,
   label,
+  delay = 0,
 }: {
-  value: string;
+  value: number;
   unit?: string;
   label: string;
+  delay?: number;
 }) {
   return (
-    <div className="rounded-xl bg-white/10 backdrop-blur-sm border border-white/15 px-4 py-3.5">
+    <div className="rounded-xl bg-white/10 backdrop-blur-md border border-white/15 px-4 py-3.5 hover:bg-white/15 transition-colors">
       <div className="flex items-baseline gap-1">
         <span className="text-3xl tracking-tight text-white" style={{ fontWeight: 700 }}>
-          {value}
+          <CountUp to={value} delay={delay} />
         </span>
         {unit && <span className="text-sm opacity-70">{unit}</span>}
       </div>
-      <div
-        className="text-[11px] uppercase tracking-wider opacity-80 mt-1"
-        style={{ fontWeight: 600 }}
-      >
+      <div className="text-[10px] uppercase tracking-[0.18em] opacity-70 mt-1" style={{ fontWeight: 600 }}>
         {label}
       </div>
     </div>
   );
 }
 
-function DecorBlobs() {
+function HeroStatText({ value, label }: { value: string; label: string }) {
   return (
-    <>
-      <div className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 rounded-full bg-white/10 blur-2xl" />
-      <div className="pointer-events-none absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-black/10 blur-3xl" />
-    </>
+    <div className="rounded-xl bg-white/10 backdrop-blur-md border border-white/15 px-4 py-3.5 hover:bg-white/15 transition-colors">
+      <div className="flex items-baseline gap-1">
+        <span className="text-3xl tracking-tight text-white" style={{ fontWeight: 700 }}>
+          {value}
+        </span>
+      </div>
+      <div className="text-[10px] uppercase tracking-[0.18em] opacity-70 mt-1" style={{ fontWeight: 600 }}>
+        {label}
+      </div>
+    </div>
   );
 }
 
@@ -327,69 +416,87 @@ function CompactTrendCard({
   if (variant === "cooling" && dish) {
     const score = Math.round(dish.trendScore * 100);
     return (
-      <div className="bg-card rounded-2xl p-5 border border-border flex flex-col">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="w-2 h-2 rounded-full bg-rose-500" />
+      <GlassCard interactive className="relative p-5 flex flex-col overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute -top-12 -right-12 w-40 h-40 rounded-full blur-3xl opacity-30 bg-rose-500"
+        />
+        <div className="relative flex items-center gap-2 mb-3">
+          <span className="w-2 h-2 rounded-full bg-rose-400 shadow-[0_0_12px] shadow-rose-500/60" />
           <span
-            className="text-xs uppercase tracking-wider text-muted-foreground"
+            className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
             style={{ fontWeight: 600 }}
           >
             Cooling Off
           </span>
-          <div className="ml-auto w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50">
-            <TrendingDown className="w-5 h-5 text-rose-600" />
+          <div className="ml-auto w-9 h-9 rounded-xl flex items-center justify-center bg-rose-500/15 border border-rose-400/25">
+            <TrendingDown className="w-5 h-5 text-rose-300" />
           </div>
         </div>
-        <div className="flex items-baseline gap-2">
+        <div className="relative flex items-baseline gap-2">
           <span
-            className="text-3xl tracking-tight leading-none text-rose-600"
-            style={{ fontWeight: 700 }}
+            className="text-4xl tracking-tight leading-none text-rose-300"
+            style={{ fontWeight: 800 }}
           >
-            {score}
+            <CountUp to={score} delay={300} />
           </span>
           <span className="text-sm text-muted-foreground">/100</span>
         </div>
-        <div className="text-base mt-2 truncate" style={{ fontWeight: 600 }}>
+        <div className="relative mt-3 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-rose-500 to-amber-400"
+            style={{ width: `${score}%` }}
+          />
+        </div>
+        <div className="relative text-base mt-3 truncate" style={{ fontWeight: 600 }}>
           {dish.name}
         </div>
-        <div className="text-sm mt-2 text-muted-foreground">{capitalize(dish.direction)}</div>
-      </div>
+        <div className="relative text-sm mt-1 text-muted-foreground">{capitalize(dish.direction)}</div>
+      </GlassCard>
     );
   }
 
   // hottest summary card
-  const coverage = total
-    ? Math.round(((servedCount ?? 0) / total) * 100)
-    : 0;
+  const coverage = total ? Math.round(((servedCount ?? 0) / total) * 100) : 0;
   return (
-    <div className="bg-card rounded-2xl p-5 border border-border flex flex-col">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="w-2 h-2 rounded-full bg-indigo-500" />
+    <GlassCard interactive className="relative p-5 flex flex-col overflow-hidden">
+      <div
+        aria-hidden
+        className="absolute -top-12 -right-12 w-40 h-40 rounded-full blur-3xl opacity-30 bg-violet-500"
+      />
+      <div className="relative flex items-center gap-2 mb-3">
+        <span className="w-2 h-2 rounded-full bg-violet-400 shadow-[0_0_12px] shadow-violet-500/60" />
         <span
-          className="text-xs uppercase tracking-wider text-muted-foreground"
+          className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
           style={{ fontWeight: 600 }}
         >
           Market Activity
         </span>
-        <div className="ml-auto w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-50">
-          <Sparkles className="w-5 h-5 text-indigo-600" />
+        <div className="ml-auto w-9 h-9 rounded-xl flex items-center justify-center bg-violet-500/15 border border-violet-400/25">
+          <Sparkles className="w-5 h-5 text-violet-300" />
         </div>
       </div>
-      <div className="flex items-baseline gap-2">
+      <div className="relative flex items-baseline gap-2">
         <span
-          className="text-3xl tracking-tight leading-none text-indigo-600"
-          style={{ fontWeight: 700 }}
+          className="text-4xl tracking-tight leading-none bg-clip-text text-transparent bg-gradient-to-br from-violet-200 to-fuchsia-300"
+          style={{ fontWeight: 800 }}
         >
-          {coverage}%
+          <CountUp to={coverage} format={(v) => `${Math.round(v)}%`} delay={300} />
         </span>
       </div>
-      <div className="text-base mt-2" style={{ fontWeight: 600 }}>
+      <div className="relative mt-3 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-violet-400 to-fuchsia-400"
+          style={{ width: `${coverage}%` }}
+        />
+      </div>
+      <div className="relative text-base mt-3" style={{ fontWeight: 600 }}>
         Coverage
       </div>
-      <div className="text-sm mt-2 text-muted-foreground">
+      <div className="relative text-sm mt-1 text-muted-foreground">
         {servedCount} of {total} trending dishes on your menu
       </div>
-    </div>
+    </GlassCard>
   );
 }
 
@@ -456,14 +563,14 @@ function TrendingList({
   const dirFor = (key: TrendingSortKey) => (sortKey === key ? sortDir : null);
 
   return (
-    <div className="bg-card rounded-2xl border border-border overflow-hidden">
+    <GlassCard className="overflow-hidden">
       <div className="p-6 border-b border-border">
         <div className="flex items-center justify-between mb-4">
           <h3 className="flex items-center gap-2">
             {positive ? (
-              <TrendingUp className="w-4 h-4 text-emerald-600" />
+              <TrendingUp className="w-4 h-4 text-emerald-300" />
             ) : (
-              <TrendingDown className="w-4 h-4 text-rose-600" />
+              <TrendingDown className="w-4 h-4 text-rose-300" />
             )}
             {title}
           </h3>
@@ -475,18 +582,15 @@ function TrendingList({
             placeholder="Search dishes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
+            className="w-full pl-10 pr-4 py-2 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 text-sm transition-colors"
           />
         </div>
       </div>
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/40 hover:bg-muted/40">
+          <TableRow className="bg-white/[0.03] hover:bg-white/[0.03]">
             <TableHead className="w-12 pl-6">
-              <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
-                style={{ fontWeight: 600 }}
-              >
+              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground" style={{ fontWeight: 600 }}>
                 #
               </span>
             </TableHead>
@@ -496,10 +600,7 @@ function TrendingList({
               </SortHeader>
             </TableHead>
             <TableHead className="text-center">
-              <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
-                style={{ fontWeight: 600 }}
-              >
+              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground" style={{ fontWeight: 600 }}>
                 Status
               </span>
             </TableHead>
@@ -522,10 +623,7 @@ function TrendingList({
               </SortHeader>
             </TableHead>
             <TableHead className="text-center pr-6">
-              <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
-                style={{ fontWeight: 600 }}
-              >
+              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground" style={{ fontWeight: 600 }}>
                 Actions
               </span>
             </TableHead>
@@ -540,7 +638,7 @@ function TrendingList({
             </TableRow>
           ) : (
             visibleItems.map((dish, index) => (
-              <TableRow key={dish.canonicalDishId} className="border-border">
+              <TableRow key={dish.canonicalDishId} className="border-border hover:bg-white/[0.03]">
                 <TableCell
                   className="pl-6 text-sm text-muted-foreground"
                   style={{ fontWeight: 600 }}
@@ -560,7 +658,7 @@ function TrendingList({
                 </TableCell>
                 <TableCell className="text-center">
                   <span
-                    className={`text-sm ${positive ? "text-emerald-600" : "text-rose-600"}`}
+                    className={`text-sm ${positive ? "text-emerald-300" : "text-rose-300"}`}
                     style={{ fontWeight: 700 }}
                   >
                     {Math.round(dish.trendScore * 100)}
@@ -578,19 +676,25 @@ function TrendingList({
         </TableBody>
       </Table>
       {!fullWidth && null /* layout switch retained for future use */}
-    </div>
+    </GlassCard>
   );
 }
 
 function StatusBadge({ servedByCafe }: { servedByCafe: boolean }) {
   return (
     <span
-      className={`inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full text-xs text-white min-w-[88px] ${
-        servedByCafe ? "bg-indigo-600" : "bg-slate-500"
+      className={`inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full text-xs min-w-[88px] border ${
+        servedByCafe
+          ? "bg-violet-500/15 border-violet-400/30 text-violet-200"
+          : "bg-white/[0.06] border-white/10 text-muted-foreground"
       }`}
       style={{ fontWeight: 600 }}
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
+      <span
+        className={`w-1.5 h-1.5 rounded-full ${
+          servedByCafe ? "bg-violet-400 shadow-[0_0_8px] shadow-violet-400/70" : "bg-white/40"
+        }`}
+      />
       {servedByCafe ? "On Menu" : "Gap"}
     </span>
   );

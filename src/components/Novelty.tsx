@@ -24,6 +24,9 @@ import { ErrorState, LoadingState } from "@/components/feedback/States";
 import { PageHeader } from "@/components/PageHeader";
 import type { DashboardData, NoveltyItem } from "@/lib/types";
 import { Pill } from "@/components/ui-extras/Badges";
+import { GlassCard } from "@/components/ui-extras/GlassCard";
+import { Reveal } from "@/components/ui-extras/Reveal";
+import { CountUp } from "@/components/ui-extras/CountUp";
 
 export function Novelty() {
   const { data, loading, error, refetch } = useDashboard();
@@ -60,30 +63,38 @@ function NoveltyContent({ data }: { data: DashboardData }) {
           subtitle="Globally trending dishes that fit your existing pantry"
         />
 
-        <NoveltyStatsRow
-          total={novelty.length}
-          zeroFriction={zeroFriction.length}
-          avgPantryMatch={avgPantryMatch}
-          top={top}
-        />
+        <Reveal delay={80}>
+          <NoveltyStatsRow
+            total={novelty.length}
+            zeroFriction={zeroFriction.length}
+            avgPantryMatch={avgPantryMatch}
+            top={top}
+          />
+        </Reveal>
 
         <div className="grid grid-cols-3 gap-6">
           {top && (
-            <div className="col-span-2">
+            <Reveal delay={220} className="col-span-2">
               <NoveltyHero dish={top} />
-            </div>
+            </Reveal>
           )}
           <div className="col-span-1 grid grid-rows-2 gap-6">
-            <ZeroFrictionCard count={zeroFriction.length} example={zeroFriction[0]} />
-            <GlobalInsightsCard
-              total={novelty.length}
-              avgPantryMatch={avgPantryMatch}
-              avgScore={avgNoveltyScore}
-            />
+            <Reveal delay={300}>
+              <ZeroFrictionCard count={zeroFriction.length} example={zeroFriction[0]} />
+            </Reveal>
+            <Reveal delay={360}>
+              <GlobalInsightsCard
+                total={novelty.length}
+                avgPantryMatch={avgPantryMatch}
+                avgScore={avgNoveltyScore}
+              />
+            </Reveal>
           </div>
         </div>
 
-        <NoveltyList items={novelty} />
+        <Reveal delay={420}>
+          <NoveltyList items={novelty} />
+        </Reveal>
       </div>
     </div>
   );
@@ -107,90 +118,133 @@ function NoveltyStatsRow({
   return (
     <div className="grid grid-cols-4 gap-4">
       <KpiCard
-        dotColor="bg-indigo-500"
-        icon={
-          <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">
-            <Layers className="w-5 h-5 text-indigo-600" />
-          </div>
-        }
+        accent="violet"
+        icon={<Layers className="w-5 h-5" />}
         label="Candidates"
-        value={total.toString()}
+        value={total}
+        delay={100}
         caption="global dishes considered"
       />
       <KpiCard
-        dotColor="bg-emerald-500"
-        icon={
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-          </div>
-        }
+        accent="emerald"
+        icon={<CheckCircle2 className="w-5 h-5" />}
         label="Zero-friction"
-        value={zeroFriction.toString()}
+        value={zeroFriction}
+        delay={180}
         caption="100% pantry match"
       />
       <KpiCard
-        dotColor="bg-amber-500"
-        icon={
-          <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center">
-            <Globe className="w-5 h-5 text-amber-600" />
-          </div>
-        }
+        accent="amber"
+        icon={<Globe className="w-5 h-5" />}
         label="Avg pantry match"
-        value={total ? `${avgPantryMatch}%` : "—"}
+        value={total ? avgPantryMatch : 0}
+        empty={!total}
+        format={(v) => `${Math.round(v)}%`}
+        delay={260}
         caption="across all candidates"
       />
       <KpiCard
-        dotColor="bg-rose-500"
-        icon={
-          <div className="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-rose-600" />
-          </div>
-        }
+        accent="rose"
+        icon={<Sparkles className="w-5 h-5" />}
         label="Top novelty"
-        value={top ? Math.round(top.noveltyScore * 100).toString() : "—"}
+        value={top ? Math.round(top.noveltyScore * 100) : 0}
+        empty={!top}
+        delay={340}
         caption={top ? top.name : "no data"}
       />
     </div>
   );
 }
 
+const KPI_ACCENT: Record<
+  "violet" | "amber" | "emerald" | "rose",
+  { dot: string; iconBg: string; iconColor: string; glow: string; bar: string }
+> = {
+  violet: {
+    dot: "bg-violet-400 shadow-[0_0_12px] shadow-violet-500/60",
+    iconBg: "bg-violet-500/15 border-violet-400/25",
+    iconColor: "text-violet-300",
+    glow: "bg-violet-500",
+    bar: "from-violet-400 to-fuchsia-400",
+  },
+  amber: {
+    dot: "bg-amber-400 shadow-[0_0_12px] shadow-amber-500/60",
+    iconBg: "bg-amber-500/15 border-amber-400/25",
+    iconColor: "text-amber-300",
+    glow: "bg-amber-500",
+    bar: "from-amber-400 to-orange-400",
+  },
+  emerald: {
+    dot: "bg-emerald-400 shadow-[0_0_12px] shadow-emerald-500/60",
+    iconBg: "bg-emerald-500/15 border-emerald-400/25",
+    iconColor: "text-emerald-300",
+    glow: "bg-emerald-500",
+    bar: "from-emerald-400 to-cyan-400",
+  },
+  rose: {
+    dot: "bg-rose-400 shadow-[0_0_12px] shadow-rose-500/60",
+    iconBg: "bg-rose-500/15 border-rose-400/25",
+    iconColor: "text-rose-300",
+    glow: "bg-rose-500",
+    bar: "from-rose-400 to-fuchsia-400",
+  },
+};
+
 function KpiCard({
-  dotColor,
+  accent,
   icon,
   label,
   value,
   caption,
+  format,
+  empty = false,
+  delay = 0,
 }: {
-  dotColor: string;
+  accent: "violet" | "amber" | "emerald" | "rose";
   icon: React.ReactNode;
   label: string;
-  value: string;
+  value: number;
   caption?: string;
+  format?: (v: number) => string;
+  empty?: boolean;
+  delay?: number;
 }) {
+  const cfg = KPI_ACCENT[accent];
   return (
-    <div className="bg-card rounded-2xl border border-border p-5">
-      <div className="flex items-center gap-2 mb-3">
-        <span className={`w-2 h-2 rounded-full ${dotColor}`} />
+    <GlassCard interactive className="relative p-5 overflow-hidden">
+      <div
+        aria-hidden
+        className={`absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-25 ${cfg.glow}`}
+      />
+      <div className="relative flex items-center gap-2 mb-3">
+        <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
         <span
-          className="text-xs uppercase tracking-wider text-muted-foreground"
+          className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
           style={{ fontWeight: 600 }}
         >
           {label}
         </span>
-        <div className="ml-auto">{icon}</div>
+        <div
+          className={`ml-auto w-9 h-9 rounded-xl flex items-center justify-center border ${cfg.iconBg} ${cfg.iconColor}`}
+        >
+          {icon}
+        </div>
       </div>
-      <div className="text-3xl tracking-tight" style={{ fontWeight: 700 }}>
-        {value}
+      <div className="relative text-3xl tracking-tight" style={{ fontWeight: 800 }}>
+        {empty ? "—" : <CountUp to={value} format={format} delay={delay} />}
       </div>
       {caption && (
         <div
-          className="text-sm text-muted-foreground mt-1.5 truncate"
+          className="relative text-sm text-muted-foreground mt-1.5 truncate"
           style={{ fontWeight: 500 }}
         >
           {caption}
         </div>
       )}
-    </div>
+      <div className="relative mt-3 h-0.5 rounded-full bg-white/[0.06] overflow-hidden">
+        <div className={`h-full w-2/3 rounded-full bg-gradient-to-r ${cfg.bar}`} />
+      </div>
+    </GlassCard>
   );
 }
 
@@ -204,26 +258,53 @@ function NoveltyHero({ dish }: { dish: NoveltyItem }) {
   const isZeroFriction = dish.missingIngredients.length === 0;
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/30 bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-400 text-white p-8 h-full">
-      <DecorBlobs />
+    <div className="relative overflow-hidden rounded-2xl border border-white/10 text-white p-8 h-full glow-pulse">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#082f49] via-[#1e1b4b] to-[#4c1d95]" />
+      <div
+        className="absolute -top-24 -right-24 w-80 h-80 rounded-full opacity-60 blur-3xl blob-float"
+        style={{
+          background: "radial-gradient(circle, rgba(56, 189, 248, 0.55), transparent 65%)",
+        }}
+      />
+      <div
+        className="absolute -bottom-32 -left-12 w-96 h-96 rounded-full opacity-50 blur-3xl blob-float"
+        style={{
+          background: "radial-gradient(circle, rgba(167, 139, 250, 0.5), transparent 65%)",
+          animationDelay: "-7s",
+        }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-[0.08]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+
       <div className="relative flex flex-col h-full justify-between gap-8">
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-white/15">
+            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm border border-white/20">
               <Sparkles className="w-4 h-4" />
             </div>
             <span
-              className="text-xs uppercase tracking-[0.15em] opacity-90"
-              style={{ fontWeight: 600 }}
+              className="text-[11px] uppercase tracking-[0.2em] opacity-90"
+              style={{ fontWeight: 700 }}
             >
               Top recommendation
             </span>
           </div>
           <div>
-            <h2 className="text-5xl leading-[1.05] mb-3 tracking-tight" style={{ fontWeight: 700 }}>
+            <h2
+              className="text-6xl leading-[1.0] mb-3 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-100 to-violet-200"
+              style={{ fontWeight: 800 }}
+            >
               {dish.name}
             </h2>
-            <p className="text-base opacity-90 max-w-xl">
+            <p className="text-base opacity-80 max-w-xl">
               {isZeroFriction
                 ? "Zero-friction add — your pantry already covers every ingredient."
                 : `Only ${dish.missingIngredients.length} ingredient${
@@ -234,21 +315,22 @@ function NoveltyHero({ dish }: { dish: NoveltyItem }) {
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          <HeroStat value={score.toString()} unit="/ 100" label="Novelty Score" />
-          <HeroStat value={`${matchPct}%`} label="Pantry Match" />
+          <HeroStat value={score} unit="/ 100" label="Novelty Score" delay={500} />
+          <HeroStat value={matchPct} format={(v) => `${Math.round(v)}%`} label="Pantry Match" delay={620} />
           <HeroStat
-            value={isZeroFriction ? "0" : dish.missingIngredients.length.toString()}
-            label={isZeroFriction ? "Missing items" : "Missing items"}
+            value={isZeroFriction ? 0 : dish.missingIngredients.length}
+            label="Missing items"
+            delay={740}
           />
         </div>
 
         <button
           type="button"
-          className="self-start inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-primary text-sm hover:bg-white/90 transition-colors shadow-lg shadow-black/10"
-          style={{ fontWeight: 600 }}
+          className="group self-start inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/95 text-violet-900 text-sm hover:bg-white transition-all shadow-lg shadow-black/20 hover:scale-[1.02]"
+          style={{ fontWeight: 700 }}
         >
           Plan this dish
-          <ArrowUpRight className="w-4 h-4" />
+          <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </button>
       </div>
     </div>
@@ -259,35 +341,27 @@ function HeroStat({
   value,
   unit,
   label,
+  format,
+  delay = 0,
 }: {
-  value: string;
+  value: number;
   unit?: string;
   label: string;
+  format?: (v: number) => string;
+  delay?: number;
 }) {
   return (
-    <div className="rounded-xl bg-white/10 backdrop-blur-sm border border-white/15 px-4 py-3.5">
+    <div className="rounded-xl bg-white/10 backdrop-blur-md border border-white/15 px-4 py-3.5 hover:bg-white/15 transition-colors">
       <div className="flex items-baseline gap-1">
         <span className="text-3xl tracking-tight text-white" style={{ fontWeight: 700 }}>
-          {value}
+          <CountUp to={value} format={format} delay={delay} />
         </span>
         {unit && <span className="text-sm opacity-70">{unit}</span>}
       </div>
-      <div
-        className="text-[11px] uppercase tracking-wider opacity-80 mt-1"
-        style={{ fontWeight: 600 }}
-      >
+      <div className="text-[10px] uppercase tracking-[0.18em] opacity-70 mt-1" style={{ fontWeight: 600 }}>
         {label}
       </div>
     </div>
-  );
-}
-
-function DecorBlobs() {
-  return (
-    <>
-      <div className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 rounded-full bg-white/10 blur-2xl" />
-      <div className="pointer-events-none absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-black/10 blur-3xl" />
-    </>
   );
 }
 
@@ -297,35 +371,39 @@ function DecorBlobs() {
 
 function ZeroFrictionCard({ count, example }: { count: number; example?: NoveltyItem }) {
   return (
-    <div className="bg-card rounded-2xl p-5 border border-border flex flex-col">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+    <GlassCard interactive className="relative p-5 flex flex-col overflow-hidden">
+      <div
+        aria-hidden
+        className="absolute -top-12 -right-12 w-40 h-40 rounded-full blur-3xl opacity-30 bg-emerald-500"
+      />
+      <div className="relative flex items-center gap-2 mb-3">
+        <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_12px] shadow-emerald-500/60" />
         <span
-          className="text-xs uppercase tracking-wider text-muted-foreground"
+          className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
           style={{ fontWeight: 600 }}
         >
           Zero-Friction
         </span>
-        <div className="ml-auto w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-50">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+        <div className="ml-auto w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-500/15 border border-emerald-400/25">
+          <CheckCircle2 className="w-5 h-5 text-emerald-300" />
         </div>
       </div>
-      <div className="flex items-baseline gap-2">
+      <div className="relative flex items-baseline gap-2">
         <span
-          className="text-3xl tracking-tight leading-none text-emerald-600"
-          style={{ fontWeight: 700 }}
+          className="text-4xl tracking-tight leading-none text-emerald-300"
+          style={{ fontWeight: 800 }}
         >
-          {count}
+          <CountUp to={count} delay={300} />
         </span>
         <span className="text-sm text-muted-foreground">ready to launch</span>
       </div>
-      <div className="text-base mt-2" style={{ fontWeight: 600 }}>
+      <div className="relative text-base mt-3" style={{ fontWeight: 600 }}>
         {example ? example.name : "no candidates"}
       </div>
-      <div className="text-sm mt-1 text-muted-foreground">
+      <div className="relative text-sm mt-1 text-muted-foreground">
         {example ? "100% pantry covered" : "needs more menu data"}
       </div>
-    </div>
+    </GlassCard>
   );
 }
 
@@ -339,32 +417,36 @@ function GlobalInsightsCard({
   avgScore: number;
 }) {
   return (
-    <div className="bg-card rounded-2xl p-5 border border-border flex flex-col">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="w-2 h-2 rounded-full bg-indigo-500" />
+    <GlassCard interactive className="relative p-5 flex flex-col overflow-hidden">
+      <div
+        aria-hidden
+        className="absolute -top-12 -right-12 w-40 h-40 rounded-full blur-3xl opacity-30 bg-violet-500"
+      />
+      <div className="relative flex items-center gap-2 mb-3">
+        <span className="w-2 h-2 rounded-full bg-violet-400 shadow-[0_0_12px] shadow-violet-500/60" />
         <span
-          className="text-xs uppercase tracking-wider text-muted-foreground"
+          className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
           style={{ fontWeight: 600 }}
         >
           Global Insights
         </span>
-        <div className="ml-auto w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-50">
-          <Globe className="w-5 h-5 text-indigo-600" />
+        <div className="ml-auto w-9 h-9 rounded-xl flex items-center justify-center bg-violet-500/15 border border-violet-400/25">
+          <Globe className="w-5 h-5 text-violet-300" />
         </div>
       </div>
-      <div className="flex items-baseline gap-2">
+      <div className="relative flex items-baseline gap-2">
         <span
-          className="text-3xl tracking-tight leading-none text-indigo-600"
-          style={{ fontWeight: 700 }}
+          className="text-4xl tracking-tight leading-none bg-clip-text text-transparent bg-gradient-to-br from-violet-200 to-fuchsia-300"
+          style={{ fontWeight: 800 }}
         >
-          {total}
+          <CountUp to={total} delay={300} />
         </span>
         <span className="text-sm text-muted-foreground">candidates</span>
       </div>
-      <div className="text-sm mt-2 text-muted-foreground">
+      <div className="relative text-sm mt-3 text-muted-foreground">
         {avgPantryMatch}% avg pantry · {avgScore}/100 avg novelty
       </div>
-    </div>
+    </GlassCard>
   );
 }
 
@@ -419,11 +501,11 @@ function NoveltyList({ items }: { items: NoveltyItem[] }) {
   const dirFor = (key: NoveltySortKey) => (sortKey === key ? sortDir : null);
 
   return (
-    <div className="bg-card rounded-2xl border border-border overflow-hidden">
+    <GlassCard className="overflow-hidden">
       <div className="p-6 border-b border-border">
         <div className="flex items-center justify-between mb-4">
           <h3 className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-primary" />
+            <Sparkles className="w-4 h-4 text-violet-300" />
             Recommended Additions
           </h3>
         </div>
@@ -434,18 +516,15 @@ function NoveltyList({ items }: { items: NoveltyItem[] }) {
             placeholder="Search dishes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
+            className="w-full pl-10 pr-4 py-2 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 text-sm transition-colors"
           />
         </div>
       </div>
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/40 hover:bg-muted/40">
+          <TableRow className="bg-white/[0.03] hover:bg-white/[0.03]">
             <TableHead className="w-12 pl-6">
-              <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
-                style={{ fontWeight: 600 }}
-              >
+              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground" style={{ fontWeight: 600 }}>
                 #
               </span>
             </TableHead>
@@ -464,10 +543,7 @@ function NoveltyList({ items }: { items: NoveltyItem[] }) {
               </SortHeader>
             </TableHead>
             <TableHead className="text-center">
-              <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
-                style={{ fontWeight: 600 }}
-              >
+              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground" style={{ fontWeight: 600 }}>
                 Missing
               </span>
             </TableHead>
@@ -481,10 +557,7 @@ function NoveltyList({ items }: { items: NoveltyItem[] }) {
               </SortHeader>
             </TableHead>
             <TableHead className="text-center pr-6">
-              <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
-                style={{ fontWeight: 600 }}
-              >
+              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground" style={{ fontWeight: 600 }}>
                 Actions
               </span>
             </TableHead>
@@ -502,7 +575,7 @@ function NoveltyList({ items }: { items: NoveltyItem[] }) {
               const matchPct = Math.round(dish.overlapRatio * 100);
               const isZeroFriction = dish.missingIngredients.length === 0;
               return (
-                <TableRow key={dish.name} className="border-border">
+                <TableRow key={dish.name} className="border-border hover:bg-white/[0.03]">
                   <TableCell
                     className="pl-6 text-sm text-muted-foreground"
                     style={{ fontWeight: 600 }}
@@ -525,13 +598,13 @@ function NoveltyList({ items }: { items: NoveltyItem[] }) {
                   </TableCell>
                   <TableCell className="text-center text-sm text-muted-foreground">
                     {isZeroFriction ? (
-                      <span className="text-emerald-600">None</span>
+                      <span className="text-emerald-300">None</span>
                     ) : (
                       dish.missingIngredients.join(", ")
                     )}
                   </TableCell>
                   <TableCell className="text-center">
-                    <span className="text-sm text-primary" style={{ fontWeight: 700 }}>
+                    <span className="text-sm text-violet-300" style={{ fontWeight: 700 }}>
                       {Math.round(dish.noveltyScore * 100)}
                     </span>
                     <span className="text-xs text-muted-foreground">/100</span>
@@ -548,6 +621,6 @@ function NoveltyList({ items }: { items: NoveltyItem[] }) {
           )}
         </TableBody>
       </Table>
-    </div>
+    </GlassCard>
   );
 }

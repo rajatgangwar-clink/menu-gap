@@ -5,6 +5,7 @@ import { useState } from "react";
 import { createChatSession, sendChatMessage } from "@/lib/api";
 import type { ChatMessage, ChatSession } from "@/lib/types";
 import { PageHeader } from "@/components/PageHeader";
+import { GlassCard } from "@/components/ui-extras/GlassCard";
 
 export function AIAssistance() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -67,7 +68,6 @@ export function AIAssistance() {
         history: sessionWithUser.messages,
       });
 
-      // Stream the reply token-by-token into the assistant bubble.
       await streamReplyIntoSession({
         fullText: reply.content,
         baseSession: sessionWithUser,
@@ -76,7 +76,6 @@ export function AIAssistance() {
         onFirstChunk: () => setIsLoading(false),
       });
 
-      // Once streaming finishes, persist the completed session in the list.
       const finalLastMessage = reply.content;
       const finalTitle =
         sessionAtStart.title === "New Conversation"
@@ -126,7 +125,8 @@ export function AIAssistance() {
             actions={
               <button
                 onClick={handleNewSession}
-                className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-lg hover:opacity-90 transition-opacity shadow-lg shadow-violet-900/40"
+                style={{ fontWeight: 600 }}
               >
                 <Plus className="w-4 h-4" />
                 <span>New Session</span>
@@ -139,20 +139,20 @@ export function AIAssistance() {
                 <input
                   type="text"
                   placeholder="Search conversations..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full pl-10 pr-4 py-2.5 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors"
                 />
               </div>
-              <button className="px-4 py-2.5 border border-border rounded-lg hover:bg-accent/50 transition-colors flex items-center gap-2">
+              <button className="px-4 py-2.5 border border-white/10 bg-white/[0.03] rounded-lg hover:bg-white/[0.06] transition-colors flex items-center gap-2">
                 <Filter className="w-4 h-4" />
                 <span className="text-sm">Filter</span>
               </button>
-              <button className="px-4 py-2.5 border border-border rounded-lg hover:bg-accent/50 transition-colors text-sm">
+              <button className="px-4 py-2.5 border border-white/10 bg-white/[0.03] rounded-lg hover:bg-white/[0.06] transition-colors text-sm">
                 Sort by Date
               </button>
             </div>
           </PageHeader>
 
-          <div className="bg-card rounded-xl border border-border">
+          <GlassCard className="fade-rise" style={{ animationDelay: "120ms" }}>
             <div className="p-6 border-b border-border">
               <h3>Previous Conversations</h3>
               <p className="text-sm text-muted-foreground mt-1">Your chat history with Menu Gap AI</p>
@@ -163,13 +163,18 @@ export function AIAssistance() {
                 <button
                   key={session.id}
                   onClick={() => setSelectedSession(session)}
-                  className={`w-full p-6 hover:bg-accent/30 transition-colors text-left ${
-                    selectedSession?.id === session.id ? "bg-accent/50" : ""
+                  className={`w-full p-6 transition-colors text-left ${
+                    selectedSession?.id === session.id
+                      ? "bg-violet-500/10"
+                      : "hover:bg-white/[0.03]"
                   }`}
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <MessageCircle className="w-5 h-5 text-primary" />
+                    <div className="relative w-10 h-10 flex-shrink-0">
+                      <div className="absolute inset-0 rounded-full bg-violet-500/30 blur-md" />
+                      <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
+                        <MessageCircle className="w-5 h-5 text-white" />
+                      </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
@@ -187,26 +192,32 @@ export function AIAssistance() {
 
               {sessions.length === 0 && (
                 <div className="p-12 text-center">
-                  <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                  <div className="relative w-14 h-14 mx-auto mb-4">
+                    <div className="absolute inset-0 rounded-full bg-violet-500/30 blur-xl" />
+                    <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-900/40">
+                      <MessageCircle className="w-7 h-7 text-white" />
+                    </div>
+                  </div>
                   <h4 className="mb-2">No conversations yet</h4>
                   <p className="text-sm text-muted-foreground mb-4">
                     Start a new session to get AI-powered menu recommendations
                   </p>
                   <button
                     onClick={handleNewSession}
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                    className="px-4 py-2 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-lg hover:opacity-90 transition-opacity shadow-lg shadow-violet-900/40"
+                    style={{ fontWeight: 600 }}
                   >
                     Start Your First Conversation
                   </button>
                 </div>
               )}
             </div>
-          </div>
+          </GlassCard>
         </div>
       </div>
 
       {selectedSession && (
-        <div className="w-[480px] bg-card border-l border-border flex flex-col">
+        <div className="w-[480px] glass border-l border-border flex flex-col fade-rise">
           <div className="p-6 border-b border-border flex items-center justify-between">
             <div>
               <h3>{selectedSession.title}</h3>
@@ -226,19 +237,19 @@ export function AIAssistance() {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setInput("Should I add ")}
-                  className="px-3 py-2 text-sm border border-border rounded-lg hover:bg-accent/50 transition-colors"
+                  className="px-3 py-2 text-sm border border-white/10 bg-white/[0.03] rounded-lg hover:bg-white/[0.07] hover:border-violet-400/30 transition-all"
                 >
                   Should I add...
                 </button>
                 <button
                   onClick={() => setInput("Should I remove ")}
-                  className="px-3 py-2 text-sm border border-border rounded-lg hover:bg-accent/50 transition-colors"
+                  className="px-3 py-2 text-sm border border-white/10 bg-white/[0.03] rounded-lg hover:bg-white/[0.07] hover:border-violet-400/30 transition-all"
                 >
                   Should I remove...
                 </button>
                 <button
                   onClick={() => setInput("Is my pricing correct for ")}
-                  className="px-3 py-2 text-sm border border-border rounded-lg hover:bg-accent/50 transition-colors"
+                  className="px-3 py-2 text-sm border border-white/10 bg-white/[0.03] rounded-lg hover:bg-white/[0.07] hover:border-violet-400/30 transition-all"
                 >
                   Pricing advice...
                 </button>
@@ -250,7 +261,12 @@ export function AIAssistance() {
             {selectedSession.messages.length === 0 ? (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center max-w-sm">
-                  <Sparkles className="w-12 h-12 text-primary mx-auto mb-3" />
+                  <div className="relative w-14 h-14 mx-auto mb-4">
+                    <div className="absolute inset-0 rounded-full bg-violet-500/30 blur-xl glow-pulse" />
+                    <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-900/40">
+                      <Sparkles className="w-7 h-7 text-white" />
+                    </div>
+                  </div>
                   <h4 className="mb-2">Ready to help!</h4>
                   <p className="text-sm text-muted-foreground">
                     Ask me about adding or removing dishes, pricing strategies, or competitor analysis.
@@ -264,10 +280,10 @@ export function AIAssistance() {
                   className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[85%] px-4 py-3 rounded-lg ${
+                    className={`max-w-[85%] px-4 py-3 rounded-2xl ${
                       message.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-accent text-foreground"
+                        ? "bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-900/30"
+                        : "border border-white/10 bg-white/[0.04] text-foreground"
                     }`}
                   >
                     <p className="text-sm leading-relaxed">{message.content}</p>
@@ -278,11 +294,11 @@ export function AIAssistance() {
 
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-accent px-4 py-3 rounded-lg">
+                <div className="border border-white/10 bg-white/[0.04] px-4 py-3 rounded-2xl">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                    <div className="w-2 h-2 bg-violet-300 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <div className="w-2 h-2 bg-violet-300 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <div className="w-2 h-2 bg-violet-300 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                   </div>
                 </div>
               </div>
@@ -297,12 +313,12 @@ export function AIAssistance() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 placeholder="Ask about a dish or menu strategy..."
-                className="flex-1 px-4 py-3 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="flex-1 px-4 py-3 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors"
               />
               <button
                 onClick={handleSend}
                 disabled={!input.trim() || isLoading}
-                className="px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-3 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-lg hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity shadow-lg shadow-violet-900/40"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -314,14 +330,9 @@ export function AIAssistance() {
   );
 }
 
-// Reveals the assistant reply token-by-token into the current session so the
-// chat bubble feels like it's streaming. The backend currently returns the
-// whole reply at once; once it streams, swap this for fetch-stream chunks.
 const STREAM_CHUNK_DELAY_MS = 25;
 
 function tokenize(text: string): string[] {
-  // Split on whitespace boundaries while keeping the whitespace as its own token,
-  // so the output reads naturally word-by-word with proper spacing.
   return text.split(/(\s+)/).filter((c) => c.length > 0);
 }
 
@@ -345,7 +356,6 @@ async function streamReplyIntoSession({
   let assembled = "";
   let firstFired = false;
 
-  // Append an empty assistant bubble so streaming has a target to grow into.
   let cur: ChatSession = {
     ...baseSession,
     title: finalTitle,

@@ -3,6 +3,8 @@
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { LegendStat } from "./LegendStat";
 import type { DashboardData } from "@/lib/types";
+import { GlassCard } from "@/components/ui-extras/GlassCard";
+import { CountUp } from "@/components/ui-extras/CountUp";
 
 export function MenuCoverageDonut({ data }: { data: DashboardData }) {
   const total = data.trending.length;
@@ -17,10 +19,11 @@ export function MenuCoverageDonut({ data }: { data: DashboardData }) {
           { name: "Served", value: served },
           { name: "Gap", value: gaps },
         ];
-  const colors = total === 0 ? ["#e5e7eb"] : ["#4f46e5", "#e5e7eb"];
+  // Bright violet "served" arc against a muted track on dark glass.
+  const colors = total === 0 ? ["rgba(255,255,255,0.06)"] : ["#a78bfa", "rgba(255,255,255,0.08)"];
 
   return (
-    <div className="bg-card rounded-2xl border border-border p-6 flex flex-col h-full">
+    <GlassCard className="p-6 flex flex-col h-full">
       <div className="mb-2">
         <h3>Menu Coverage</h3>
         <p className="text-xs text-muted-foreground mt-1">
@@ -49,19 +52,22 @@ export function MenuCoverageDonut({ data }: { data: DashboardData }) {
           </PieChart>
         </ResponsiveContainer>
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <div className="text-4xl tracking-tight" style={{ fontWeight: 700 }}>
-            {pct}%
+          <div
+            className="text-4xl tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-violet-200 to-fuchsia-300"
+            style={{ fontWeight: 800 }}
+          >
+            <CountUp to={pct} format={(v) => `${Math.round(v)}%`} />
           </div>
-          <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">
+          <div className="text-[10px] text-muted-foreground uppercase tracking-[0.18em] mt-1" style={{ fontWeight: 600 }}>
             Coverage
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 pt-4 border-t border-border mt-2">
-        <LegendStat dotColor="bg-indigo-500" label="On menu" value={served.toString()} />
-        <LegendStat dotColor="bg-gray-300" label="Gap" value={gaps.toString()} />
+        <LegendStat dotColor="bg-violet-400 shadow-[0_0_10px] shadow-violet-400/60" label="On menu" value={served.toString()} />
+        <LegendStat dotColor="bg-white/20" label="Gap" value={gaps.toString()} />
       </div>
-    </div>
+    </GlassCard>
   );
 }
