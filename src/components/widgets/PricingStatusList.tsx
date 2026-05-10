@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { DashboardData, PriceLabel } from "@/lib/types";
+import { GlassCard } from "@/components/ui-extras/GlassCard";
 
 type StatusFilter = "all" | PriceLabel;
 
@@ -38,7 +39,7 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
   const activeFilter = FILTER_OPTIONS.find((o) => o.key === statusFilter)!;
 
   return (
-    <div className="bg-card rounded-2xl border border-border overflow-hidden flex flex-col h-full">
+    <GlassCard className="overflow-hidden flex flex-col h-full">
       <div className="p-6 border-b border-border">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -54,14 +55,14 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
               placeholder="Search dishes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
+              className="w-full pl-10 pr-4 py-2 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 text-sm transition-colors"
             />
           </div>
           <div className="relative">
             <button
               type="button"
               onClick={() => setFilterOpen((o) => !o)}
-              className="flex items-center gap-2 px-3 py-2 border border-border rounded-lg hover:bg-accent/50 transition-colors text-sm"
+              className="flex items-center gap-2 px-3 py-2 border border-white/10 bg-white/[0.03] rounded-lg hover:bg-white/[0.06] transition-colors text-sm"
             >
               <Filter className="w-4 h-4" />
               <span>{activeFilter.label}</span>
@@ -74,7 +75,7 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
                   onClick={() => setFilterOpen(false)}
                   aria-hidden
                 />
-                <div className="absolute right-0 top-full mt-1 w-44 bg-card rounded-lg shadow-lg border border-border z-50 py-1">
+                <div className="absolute right-0 top-full mt-1 w-44 glass-strong rounded-lg border border-white/10 z-50 py-1">
                   {FILTER_OPTIONS.map((opt) => (
                     <button
                       key={opt.key}
@@ -83,14 +84,14 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
                         setStatusFilter(opt.key);
                         setFilterOpen(false);
                       }}
-                      className={`w-full text-left px-3 py-2 text-sm hover:bg-accent/50 transition-colors flex items-center justify-between ${
-                        statusFilter === opt.key ? "text-primary" : "text-foreground"
+                      className={`w-full text-left px-3 py-2 text-sm hover:bg-white/[0.06] transition-colors flex items-center justify-between ${
+                        statusFilter === opt.key ? "text-violet-300" : "text-foreground"
                       }`}
                       style={{ fontWeight: statusFilter === opt.key ? 600 : 500 }}
                     >
                       {opt.label}
                       {statusFilter === opt.key && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-violet-400 shadow-[0_0_8px] shadow-violet-400/60" />
                       )}
                     </button>
                   ))}
@@ -103,10 +104,10 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
       <div className="flex-1 overflow-y-auto" style={{ maxHeight: 280 }}>
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/40 hover:bg-muted/40 sticky top-0 z-10">
+          <TableRow className="bg-white/[0.03] hover:bg-white/[0.03] sticky top-0 z-10 backdrop-blur-md">
             <TableHead className="pl-6">
               <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
+                className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
                 style={{ fontWeight: 600 }}
               >
                 Dish
@@ -114,7 +115,7 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
             </TableHead>
             <TableHead className="text-center">
               <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
+                className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
                 style={{ fontWeight: 600 }}
               >
                 Price
@@ -122,7 +123,7 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
             </TableHead>
             <TableHead className="text-center">
               <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
+                className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
                 style={{ fontWeight: 600 }}
               >
                 Market
@@ -130,7 +131,7 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
             </TableHead>
             <TableHead className="text-center pr-6">
               <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
+                className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
                 style={{ fontWeight: 600 }}
               >
                 Status
@@ -147,7 +148,7 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
             </TableRow>
           ) : (
             filtered.map((r) => (
-              <TableRow key={r.menuItemId} className="border-border">
+              <TableRow key={r.menuItemId} className="border-border hover:bg-white/[0.03]">
                 <TableCell className="pl-6">
                   <div className="text-sm truncate" style={{ fontWeight: 600 }}>
                     {r.name}
@@ -168,23 +169,43 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
         </TableBody>
       </Table>
       </div>
-    </div>
+    </GlassCard>
   );
 }
 
+// Status badges on dark glass — translucent tints with a subtle inner glow
+// so the colors read as labels, not solid buttons.
 function StatusBadge({ label }: { label: PriceLabel }) {
   const map = {
-    underpriced: { bg: "bg-emerald-600", label: "Underpriced" },
-    fair: { bg: "bg-amber-500", label: "Fair" },
-    overpriced: { bg: "bg-rose-600", label: "Overpriced" },
+    underpriced: {
+      bg: "bg-emerald-500/15",
+      border: "border-emerald-400/30",
+      dot: "bg-emerald-400 shadow-[0_0_8px] shadow-emerald-400/70",
+      text: "text-emerald-300",
+      label: "Underpriced",
+    },
+    fair: {
+      bg: "bg-amber-500/15",
+      border: "border-amber-400/30",
+      dot: "bg-amber-400 shadow-[0_0_8px] shadow-amber-400/70",
+      text: "text-amber-300",
+      label: "Fair",
+    },
+    overpriced: {
+      bg: "bg-rose-500/15",
+      border: "border-rose-400/30",
+      dot: "bg-rose-400 shadow-[0_0_8px] shadow-rose-400/70",
+      text: "text-rose-300",
+      label: "Overpriced",
+    },
   } as const;
   const cfg = map[label];
   return (
     <span
-      className={`inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full text-xs text-white min-w-[108px] ${cfg.bg}`}
+      className={`inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full text-xs min-w-[108px] border ${cfg.bg} ${cfg.border} ${cfg.text}`}
       style={{ fontWeight: 600 }}
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
+      <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
       {cfg.label}
     </span>
   );

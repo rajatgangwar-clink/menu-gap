@@ -12,15 +12,7 @@ import type {
 } from "./types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-// Hard override — when set, every cafe-scoped API call targets this ID
-// regardless of the restaurant returned by /login.
-const OVERRIDE_CAFE_ID = process.env.NEXT_PUBLIC_DEMO_CAFE_ID;
-
-function currentCafeId(): number | string {
-  if (OVERRIDE_CAFE_ID) return OVERRIDE_CAFE_ID;
-  const restaurant = getRestaurant();
-  return restaurant?.id ?? "1";
-}
+const DEMO_CAFE_ID = process.env.NEXT_PUBLIC_DEMO_CAFE_ID ?? "30";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {

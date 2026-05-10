@@ -32,6 +32,8 @@ import type {
   PerformerItem,
   PriceLabel,
 } from "@/lib/types";
+import { GlassCard } from "@/components/ui-extras/GlassCard";
+import { Reveal } from "@/components/ui-extras/Reveal";
 
 interface MenuDish {
   menuItemId: number;
@@ -64,13 +66,18 @@ export function MyDishes() {
       <div className="flex-1 overflow-y-auto">
         <div className="p-6 space-y-6">
           <PageHeader title="My Dishes" subtitle="Detailed performance analysis of your menu" />
-          {currentDish && <DishShowcase dish={currentDish} />}
-
-          <AllDishesTable
-            dishes={dishes}
-            selectedDishId={currentDish?.menuItemId ?? null}
-            onSelect={setSelectedDishId}
-          />
+          {currentDish && (
+            <Reveal delay={120}>
+              <DishShowcase dish={currentDish} />
+            </Reveal>
+          )}
+          <Reveal delay={220}>
+            <AllDishesTable
+              dishes={dishes}
+              selectedDishId={currentDish?.menuItemId ?? null}
+              onSelect={setSelectedDishId}
+            />
+          </Reveal>
         </div>
       </div>
 
@@ -144,7 +151,7 @@ function AllDishesTable({
   const dirFor = (key: DishSortKey) => (sortKey === key ? sortDir : null);
 
   return (
-    <div className="bg-card rounded-2xl border border-border overflow-hidden">
+    <GlassCard className="overflow-hidden">
       <div className="p-6 border-b border-border">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -159,13 +166,13 @@ function AllDishesTable({
             placeholder="Search your dishes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
+            className="w-full pl-10 pr-4 py-2 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 text-sm transition-colors"
           />
         </div>
       </div>
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/40 hover:bg-muted/40">
+          <TableRow className="bg-white/[0.03] hover:bg-white/[0.03]">
             <TableHead className="w-12 pl-6">
               <SortHeader direction={dirFor("rank")} onClick={() => onSort("rank")}>
                 #
@@ -177,10 +184,7 @@ function AllDishesTable({
               </SortHeader>
             </TableHead>
             <TableHead className="text-center">
-              <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
-                style={{ fontWeight: 600 }}
-              >
+              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground" style={{ fontWeight: 600 }}>
                 Status
               </span>
             </TableHead>
@@ -212,18 +216,12 @@ function AllDishesTable({
               </SortHeader>
             </TableHead>
             <TableHead className="text-center">
-              <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
-                style={{ fontWeight: 600 }}
-              >
+              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground" style={{ fontWeight: 600 }}>
                 Market
               </span>
             </TableHead>
             <TableHead className="text-center">
-              <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
-                style={{ fontWeight: 600 }}
-              >
+              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground" style={{ fontWeight: 600 }}>
                 Pricing
               </span>
             </TableHead>
@@ -237,10 +235,7 @@ function AllDishesTable({
               </SortHeader>
             </TableHead>
             <TableHead className="text-center pr-6">
-              <span
-                className="text-xs uppercase tracking-wider text-muted-foreground"
-                style={{ fontWeight: 600 }}
-              >
+              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground" style={{ fontWeight: 600 }}>
                 Actions
               </span>
             </TableHead>
@@ -258,8 +253,8 @@ function AllDishesTable({
               <TableRow
                 key={dish.menuItemId}
                 onClick={() => onSelect(dish.menuItemId)}
-                className={`cursor-pointer ${
-                  dish.menuItemId === selectedDishId ? "bg-accent/40" : ""
+                className={`cursor-pointer transition-colors hover:bg-white/[0.04] ${
+                  dish.menuItemId === selectedDishId ? "bg-violet-500/10" : ""
                 }`}
               >
                 <TableCell
@@ -290,7 +285,7 @@ function AllDishesTable({
                   <PriceTag dish={dish} />
                 </TableCell>
                 <TableCell className="text-center">
-                  <span className="text-sm text-primary" style={{ fontWeight: 700 }}>
+                  <span className="text-sm text-violet-300" style={{ fontWeight: 700 }}>
                     {Math.round(dish.performanceScore * 100)}
                   </span>
                   <span className="text-xs text-muted-foreground">/100</span>
@@ -303,49 +298,74 @@ function AllDishesTable({
           )}
         </TableBody>
       </Table>
-    </div>
+    </GlassCard>
   );
 }
 
 function DishShowcase({ dish }: { dish: MenuDish }) {
   return (
-    <div className="bg-card rounded-xl border border-border overflow-hidden">
-      <div className="grid grid-cols-2 gap-6 p-6">
-        <div className="aspect-[4/3] bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-4xl">{dish.name[0]}</span>
+    <div className="relative overflow-hidden rounded-2xl border border-white/10 glass-strong">
+      <div
+        aria-hidden
+        className="absolute -top-32 -right-24 w-80 h-80 rounded-full opacity-40 blur-3xl bg-violet-500"
+      />
+      <div
+        aria-hidden
+        className="absolute -bottom-24 -left-16 w-72 h-72 rounded-full opacity-30 blur-3xl bg-fuchsia-500"
+      />
+      <div className="relative grid grid-cols-2 gap-6 p-6">
+        <div className="aspect-[4/3] rounded-xl flex items-center justify-center relative overflow-hidden border border-white/10 bg-gradient-to-br from-violet-500/20 via-indigo-500/15 to-fuchsia-500/20">
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-[0.12]"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+              backgroundSize: "32px 32px",
+            }}
+          />
+          <div className="relative text-center">
+            <div className="relative w-24 h-24 mx-auto mb-3">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-400 to-fuchsia-400 blur-2xl opacity-60" />
+              <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-violet-500 via-indigo-500 to-fuchsia-500 flex items-center justify-center shadow-2xl shadow-violet-900/40 ring-1 ring-white/20">
+                <span className="text-4xl text-white" style={{ fontWeight: 700 }}>
+                  {dish.name[0]}
+                </span>
+              </div>
             </div>
-            <h2>{dish.name}</h2>
+            <h2
+              className="bg-clip-text text-transparent bg-gradient-to-r from-white via-violet-100 to-fuchsia-200"
+              style={{ fontWeight: 700 }}
+            >
+              {dish.name}
+            </h2>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3>Performance Analysis</h3>
-            <span className={`px-3 py-1 rounded-full text-sm ${statusColor(dish.status)}`}>
-              {dish.status}
-            </span>
+            <StatusBadge status={dish.status} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <StatCard
-              icon={<Star className="w-4 h-4 text-primary" />}
+              icon={<Star className="w-4 h-4 text-amber-300" />}
               label="Rating"
               value={`${dish.rating.toFixed(1)}/5`}
             />
             <StatCard
-              icon={<Users className="w-4 h-4 text-primary" />}
+              icon={<Users className="w-4 h-4 text-cyan-300" />}
               label="Reviews"
               value={dish.reviewCount.toLocaleString()}
             />
             <StatCard
-              icon={<DollarSign className="w-4 h-4 text-primary" />}
+              icon={<DollarSign className="w-4 h-4 text-emerald-300" />}
               label="Your Price"
               value={dish.yourPrice != null ? `₹${dish.yourPrice.toFixed(0)}` : "—"}
             />
             <StatCard
-              icon={<BarChart3 className="w-4 h-4 text-primary" />}
+              icon={<BarChart3 className="w-4 h-4 text-violet-300" />}
               label="Market Avg"
               value={dish.avgGroupPrice != null ? `₹${dish.avgGroupPrice.toFixed(0)}` : "—"}
             />
@@ -355,19 +375,20 @@ function DishShowcase({ dish }: { dish: MenuDish }) {
             <div className="text-sm mb-3" style={{ fontWeight: 600 }}>
               Performance Factors
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {placeholderPerformanceFactors.map((factor, index) => (
                 <div key={index}>
-                  <div className="flex justify-between text-sm mb-1">
+                  <div className="flex justify-between text-sm mb-1.5">
                     <span className="text-muted-foreground">{factor.label}</span>
-                    <span style={{ fontWeight: 600 }}>{factor.score}%</span>
+                    <span style={{ fontWeight: 700 }}>{factor.score}%</span>
                   </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
                     <div
-                      className="h-full rounded-full transition-all"
+                      className="h-full rounded-full transition-[width] duration-1000 ease-out"
                       style={{
                         width: `${factor.score}%`,
-                        backgroundColor: factorColor(factor.status),
+                        background: factorGradient(factor.status),
+                        boxShadow: `0 0 12px ${factorGlow(factor.status)}`,
                       }}
                     />
                   </div>
@@ -386,17 +407,35 @@ function PriceTag({ dish }: { dish: MenuDish }) {
     return <span className="text-xs text-muted-foreground">Not benchmarked</span>;
   }
   const map = {
-    underpriced: { bg: "bg-emerald-600", label: "Underpriced" },
-    fair: { bg: "bg-amber-500", label: "Fair" },
-    overpriced: { bg: "bg-rose-600", label: "Overpriced" },
+    underpriced: {
+      bg: "bg-emerald-500/15",
+      border: "border-emerald-400/30",
+      text: "text-emerald-300",
+      dot: "bg-emerald-400 shadow-[0_0_8px] shadow-emerald-400/70",
+      label: "Underpriced",
+    },
+    fair: {
+      bg: "bg-amber-500/15",
+      border: "border-amber-400/30",
+      text: "text-amber-300",
+      dot: "bg-amber-400 shadow-[0_0_8px] shadow-amber-400/70",
+      label: "Fair",
+    },
+    overpriced: {
+      bg: "bg-rose-500/15",
+      border: "border-rose-400/30",
+      text: "text-rose-300",
+      dot: "bg-rose-400 shadow-[0_0_8px] shadow-rose-400/70",
+      label: "Overpriced",
+    },
   } as const;
   const cfg = map[dish.priceLabel];
   return (
     <span
-      className={`inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full text-xs text-white min-w-[108px] ${cfg.bg}`}
+      className={`inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full text-xs min-w-[108px] border ${cfg.bg} ${cfg.border} ${cfg.text}`}
       style={{ fontWeight: 600 }}
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
+      <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
       {cfg.label}
     </span>
   );
@@ -404,18 +443,38 @@ function PriceTag({ dish }: { dish: MenuDish }) {
 
 function StatusBadge({ status }: { status: PerformanceStatus }) {
   const map = {
-    Excellent: { bg: "bg-emerald-600" },
-    Good: { bg: "bg-indigo-600" },
-    Average: { bg: "bg-amber-500" },
-    Poor: { bg: "bg-rose-600" },
+    Excellent: {
+      bg: "bg-emerald-500/15",
+      border: "border-emerald-400/30",
+      text: "text-emerald-300",
+      dot: "bg-emerald-400 shadow-[0_0_8px] shadow-emerald-400/70",
+    },
+    Good: {
+      bg: "bg-violet-500/15",
+      border: "border-violet-400/30",
+      text: "text-violet-300",
+      dot: "bg-violet-400 shadow-[0_0_8px] shadow-violet-400/70",
+    },
+    Average: {
+      bg: "bg-amber-500/15",
+      border: "border-amber-400/30",
+      text: "text-amber-300",
+      dot: "bg-amber-400 shadow-[0_0_8px] shadow-amber-400/70",
+    },
+    Poor: {
+      bg: "bg-rose-500/15",
+      border: "border-rose-400/30",
+      text: "text-rose-300",
+      dot: "bg-rose-400 shadow-[0_0_8px] shadow-rose-400/70",
+    },
   } as const;
   const cfg = map[status];
   return (
     <span
-      className={`inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full text-xs text-white min-w-[88px] ${cfg.bg}`}
+      className={`inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full text-xs min-w-[88px] border ${cfg.bg} ${cfg.border} ${cfg.text}`}
       style={{ fontWeight: 600 }}
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
+      <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
       {status}
     </span>
   );
@@ -424,7 +483,7 @@ function StatusBadge({ status }: { status: PerformanceStatus }) {
 function ComparisonSidebar({ dish }: { dish: MenuDish | null }) {
   if (!dish) {
     return (
-      <aside className="w-80 bg-card border-l border-border overflow-y-auto">
+      <aside className="w-80 glass border-l border-border overflow-y-auto">
         <div className="p-6 border-b border-border">
           <h3>Compare Performance</h3>
           <p className="text-sm text-muted-foreground mt-1">Select a dish to compare</p>
@@ -439,7 +498,7 @@ function ComparisonSidebar({ dish }: { dish: MenuDish | null }) {
       : null;
 
   return (
-    <aside className="w-80 bg-card border-l border-border overflow-y-auto">
+    <aside className="w-80 glass border-l border-border overflow-y-auto fade-rise" style={{ animationDelay: "300ms" }}>
       <div className="p-6 border-b border-border">
         <h3>Compare Performance</h3>
         <p className="text-sm text-muted-foreground mt-1">vs. Competitors</p>
@@ -482,7 +541,10 @@ function ComparisonSidebar({ dish }: { dish: MenuDish | null }) {
           </p>
           <div className="space-y-3">
             {placeholderCompetitors.map((comp, index) => (
-              <div key={comp.name} className="p-3 border border-border rounded-lg">
+              <div
+                key={comp.name}
+                className="p-3 rounded-lg glass hover-lift"
+              >
                 <div className="flex items-center justify-between mb-2">
                   <div className="text-sm" style={{ fontWeight: 600 }}>
                     {comp.name}
@@ -490,7 +552,10 @@ function ComparisonSidebar({ dish }: { dish: MenuDish | null }) {
                   <span className="text-xs text-muted-foreground">#{index + 2}</span>
                 </div>
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{comp.rating}/5</span>
+                  <span className="flex items-center gap-1">
+                    <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                    {comp.rating}/5
+                  </span>
                   <span>₹{comp.price}</span>
                 </div>
               </div>
@@ -512,12 +577,14 @@ function StatCard({
   value: string;
 }) {
   return (
-    <div className="p-4 bg-accent/50 rounded-lg">
+    <div className="p-4 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.06] transition-colors">
       <div className="flex items-center gap-2 mb-2">
         {icon}
-        <div className="text-xs text-muted-foreground">{label}</div>
+        <div className="text-xs text-muted-foreground uppercase tracking-wider" style={{ fontWeight: 600 }}>
+          {label}
+        </div>
       </div>
-      <div className="text-2xl" style={{ fontWeight: 600 }}>
+      <div className="text-2xl" style={{ fontWeight: 700 }}>
         {value}
       </div>
     </div>
@@ -536,13 +603,18 @@ function SidebarStat({
   tone: "positive" | "muted";
 }) {
   return (
-    <div className="p-4 bg-accent/50 rounded-lg">
-      <div className="text-xs text-muted-foreground mb-1">{label}</div>
-      <div className="text-2xl mb-2" style={{ fontWeight: 600 }}>
+    <div className="p-4 rounded-lg border border-white/10 bg-white/[0.04]">
+      <div className="text-xs text-muted-foreground mb-1 uppercase tracking-wider" style={{ fontWeight: 600 }}>
+        {label}
+      </div>
+      <div
+        className="text-2xl mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-violet-200"
+        style={{ fontWeight: 700 }}
+      >
         {value}
       </div>
       <p
-        className={`text-xs ${tone === "positive" ? "text-status-positive-foreground" : "text-muted-foreground"}`}
+        className={`text-xs ${tone === "positive" ? "text-emerald-300" : "text-muted-foreground"}`}
       >
         {detail}
       </p>
@@ -603,27 +675,24 @@ function scoreToStatus(score: number): PerformanceStatus {
   return "Poor";
 }
 
-function statusColor(status: PerformanceStatus): string {
-  switch (status) {
-    case "Excellent":
-      return "bg-status-positive text-status-positive-foreground";
-    case "Good":
-      return "bg-status-caution text-status-caution-foreground";
-    case "Average":
-      return "bg-muted text-muted-foreground";
-    case "Poor":
-      return "bg-status-negative text-status-negative-foreground";
-  }
-}
-
-function factorColor(status: string): string {
+function factorGradient(status: string): string {
   switch (status) {
     case "excellent":
-      return "#10b981";
+      return "linear-gradient(90deg, #34d399, #06b6d4)";
     case "good":
-      return "#f59e0b";
+      return "linear-gradient(90deg, #fbbf24, #fb923c)";
     default:
-      return "#6b7280";
+      return "linear-gradient(90deg, #94a3b8, #64748b)";
   }
 }
 
+function factorGlow(status: string): string {
+  switch (status) {
+    case "excellent":
+      return "rgba(52, 211, 153, 0.55)";
+    case "good":
+      return "rgba(251, 191, 36, 0.55)";
+    default:
+      return "rgba(148, 163, 184, 0.35)";
+  }
+}
