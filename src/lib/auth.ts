@@ -1,74 +1,188 @@
-// Lightweight bearer-token cache for the demo.
+// Bearer-token cache for the demo. The token is acquired via the /login endpoint
+// (see loginWithCredentials below) and mirrored to:
+//   - sessionStorage   → fast client-side reads
+//   - a cookie         → so Next.js Proxy (middleware) can gate routes server-side
 //
-// Strategy:
-//   1. If NEXT_PUBLIC_API_TOKEN is set in env, use it directly (no login).
-//   2. Otherwise login once with NEXT_PUBLIC_DEMO_EMAIL / NEXT_PUBLIC_DEMO_PASSWORD,
-//      cache the token in memory + sessionStorage, and reuse it for subsequent calls.
-//
-// Tokens are kept in-memory (and mirrored to sessionStorage so a page reload doesn't
-// trigger a fresh login). For a real auth flow, replace this with proper session management.
+// Both are kept in sync via writeToken / clearAuthToken.
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 const STATIC_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
-const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? "";
-const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD ?? "";
 
-const STORAGE_KEY = "menu_gap_token";
+export const TOKEN_COOKIE_NAME = "menu_gap_token";
+const STORAGE_KEY = TOKEN_COOKIE_NAME;
+const RESTAURANT_STORAGE_KEY = "menu_gap_restaurant";
+const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24; // 24 hours
 
 let cachedToken: string | null = null;
-let inflight: Promise<string> | null = null;
+
+export interface RestaurantProfile {
+  id?: number | string;
+  name: string;
+}
+
+let cachedRestaurant: RestaurantProfile | null = null;
+
+export class AuthRequiredError extends Error {
+  constructor(message = "Not authenticated") {
+    super(message);
+    this.name = "AuthRequiredError";
+  }
+}
 
 export async function getAuthToken(): Promise<string> {
   if (STATIC_TOKEN) return STATIC_TOKEN;
   if (cachedToken) return cachedToken;
 
   if (typeof window !== "undefined") {
-    const stored = sessionStorage.getItem(STORAGE_KEY);
+    const stored = sessionStorage.getItem(STORAGE_KEY) ?? readCookie(TOKEN_COOKIE_NAME);
     if (stored) {
       cachedToken = stored;
       return stored;
     }
   }
 
-  if (!inflight) inflight = login();
-  try {
-    const token = await inflight;
-    cachedToken = token;
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem(STORAGE_KEY, token);
-    }
-    return token;
-  } finally {
-    inflight = null;
+  throw new AuthRequiredError("Not authenticated. Sign in first.");
+}
+
+export function isAuthenticated(): boolean {
+  if (STATIC_TOKEN) return true;
+  if (cachedToken) return true;
+  if (typeof window !== "undefined") {
+    return !!(sessionStorage.getItem(STORAGE_KEY) || readCookie(TOKEN_COOKIE_NAME));
   }
+  return false;
 }
 
 export function clearAuthToken(): void {
   cachedToken = null;
+  cachedRestaurant = null;
   if (typeof window !== "undefined") {
     sessionStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(RESTAURANT_STORAGE_KEY);
+    writeCookie(TOKEN_COOKIE_NAME, "", 0);
+    notifyAuthChange();
   }
 }
 
-async function login(): Promise<string> {
-  if (!API_BASE_URL) throw new Error("NEXT_PUBLIC_API_BASE_URL is not set");
-  if (!DEMO_EMAIL || !DEMO_PASSWORD) {
-    throw new Error("NEXT_PUBLIC_DEMO_EMAIL / NEXT_PUBLIC_DEMO_PASSWORD must be set");
+export function getRestaurant(): RestaurantProfile | null {
+  if (cachedRestaurant) return cachedRestaurant;
+  if (typeof window === "undefined") return null;
+  const raw = sessionStorage.getItem(RESTAURANT_STORAGE_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as RestaurantProfile;
+    cachedRestaurant = parsed;
+    return parsed;
+  } catch {
+    return null;
   }
+}
+
+function writeRestaurant(restaurant: RestaurantProfile | null) {
+  cachedRestaurant = restaurant;
+  if (typeof window === "undefined") return;
+  if (restaurant) {
+    sessionStorage.setItem(RESTAURANT_STORAGE_KEY, JSON.stringify(restaurant));
+  } else {
+    sessionStorage.removeItem(RESTAURANT_STORAGE_KEY);
+  }
+}
+
+function writeToken(token: string) {
+  cachedToken = token;
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem(STORAGE_KEY, token);
+    writeCookie(TOKEN_COOKIE_NAME, token, COOKIE_MAX_AGE_SECONDS);
+    notifyAuthChange();
+  }
+}
+
+function writeCookie(name: string, value: string, maxAgeSeconds: number) {
+  if (typeof document === "undefined") return;
+  const isSecure = typeof window !== "undefined" && window.location.protocol === "https:";
+  const parts = [
+    `${name}=${encodeURIComponent(value)}`,
+    "path=/",
+    `max-age=${maxAgeSeconds}`,
+    "samesite=lax",
+  ];
+  if (isSecure) parts.push("secure");
+  document.cookie = parts.join("; ");
+}
+
+function readCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp("(?:^|; )" + name + "=([^;]*)"));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function notifyAuthChange() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("menugap:auth-change"));
+  }
+}
+
+export async function loginWithCredentials(
+  email: string,
+  password: string
+): Promise<string> {
+  if (!API_BASE_URL) throw new Error("NEXT_PUBLIC_API_BASE_URL is not set");
 
   const res = await fetch(`${API_BASE_URL}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user: { email: DEMO_EMAIL, password: DEMO_PASSWORD } }),
+    body: JSON.stringify({ user: { email, password } }),
   });
 
+  if (res.status === 401) {
+    throw new Error("Invalid email or password.");
+  }
   if (!res.ok) {
     throw new Error(`Login failed: ${res.status} ${res.statusText}`);
   }
 
-  const data = (await res.json()) as { token?: string };
+  const data = (await res.json()) as LoginResponse;
   if (!data.token) {
-    throw new Error("Login response did not include a token");
+    throw new Error("Login response did not include a token.");
   }
+
+  writeToken(data.token);
+  const restaurant = extractRestaurant(data);
+  if (restaurant) writeRestaurant(restaurant);
   return data.token;
+}
+
+// Defensive parse — accept several common response shapes for the restaurant
+// metadata since the backend may evolve the field name.
+interface LoginResponse {
+  token?: string;
+  restaurant?: { id?: number | string; name?: string };
+  cafe?: { id?: number | string; name?: string };
+  user?: {
+    restaurant?: { id?: number | string; name?: string };
+    cafe?: { id?: number | string; name?: string };
+    restaurant_name?: string;
+    cafe_name?: string;
+    cafe_id?: number | string;
+    restaurant_id?: number | string;
+  };
+}
+
+function extractRestaurant(data: LoginResponse): RestaurantProfile | null {
+  const candidates: Array<{ id?: number | string; name?: string } | undefined> = [
+    data.restaurant,
+    data.cafe,
+    data.user?.restaurant,
+    data.user?.cafe,
+    data.user
+      ? {
+          name: data.user.restaurant_name ?? data.user.cafe_name,
+          id: data.user.restaurant_id ?? data.user.cafe_id,
+        }
+      : undefined,
+  ];
+  for (const c of candidates) {
+    if (c?.name) return { id: c.id, name: c.name };
+  }
+  return null;
 }

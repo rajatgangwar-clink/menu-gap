@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Bricolage_Grotesque, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "@/components/Sidebar";
-import { DashboardProvider } from "@/hooks/use-dashboard";
+import { AppShell } from "@/components/AppShell";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -38,12 +37,7 @@ export default function RootLayout({
       className={`${inter.variable} ${bricolage.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="h-full">
-        <DashboardProvider>
-          <div className="flex h-screen bg-background overflow-hidden">
-            <Sidebar />
-            <main className="flex-1 overflow-hidden">{children}</main>
-          </div>
-        </DashboardProvider>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
