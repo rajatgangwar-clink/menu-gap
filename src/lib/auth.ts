@@ -1,21 +1,19 @@
-// Lightweight bearer-token cache for the demo.
+// Bearer-token cache. The token is acquired via the /login endpoint
+// (see loginWithCredentials) and mirrored to:
+//   - sessionStorage   → fast client-side reads
+//   - a cookie         → so Next.js Proxy (middleware) can gate routes server-side
 //
-// Strategy:
-//   1. If NEXT_PUBLIC_API_TOKEN is set in env, use it directly (no login).
-//   2. If user has logged in via LoginForm, use the stored token.
-//   3. Otherwise login with NEXT_PUBLIC_DEMO_EMAIL / NEXT_PUBLIC_DEMO_PASSWORD,
-//      cache the token in memory + sessionStorage, and reuse it for subsequent calls.
-//
-// Tokens are kept in-memory (and mirrored to sessionStorage so a page reload doesn't
-// trigger a fresh login). For a real auth flow, replace this with proper session management.
+// Both are kept in sync via writeToken / clearAuthToken.
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-const STATIC_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN ?? "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI3YjU5MjQ0NS1mZGRjLTQ0YjYtODVlZS00ZGI4MWIxYzEzODciLCJzdWIiOiIzMCIsInNjcCI6InVzZXIiLCJhdWQiOm51bGwsImlhdCI6MTc3ODQ1MTA2NywiZXhwIjoxNzc5MDU1ODY3fQ.xlK9TbrBlf";
-const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? "";
-const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD ?? "";
+// Optional override — only honored if the env var is set. Empty / unset means
+// the user must log in to get a token.
+const STATIC_TOKEN = process.env.NEXT_PUBLIC_API_TOKEN;
 
-const STORAGE_KEY = "menu_gap_token";
-const AUTH_TOKEN_KEY = "auth_token";
+export const TOKEN_COOKIE_NAME = "menu_gap_token";
+const STORAGE_KEY = TOKEN_COOKIE_NAME;
+const RESTAURANT_STORAGE_KEY = "menu_gap_restaurant";
+const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24; // 24 hours
 
 let cachedToken: string | null = null;
 
@@ -38,31 +36,21 @@ export async function getAuthToken(): Promise<string> {
   if (cachedToken) return cachedToken;
 
   if (typeof window !== "undefined") {
-    // Check for user-provided auth token first
-    const userToken = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (userToken) {
-      cachedToken = userToken;
-      return userToken;
-    }
-
-    const stored = sessionStorage.getItem(STORAGE_KEY);
+    const stored = sessionStorage.getItem(STORAGE_KEY) ?? readCookie(TOKEN_COOKIE_NAME);
     if (stored) {
       cachedToken = stored;
       return stored;
     }
   }
 
-  if (!inflight) inflight = loginWithDemoCredentials();
-  try {
-    const token = await inflight;
-    cachedToken = token;
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem(STORAGE_KEY, token);
-    }
-    return token;
-  } finally {
-    inflight = null;
-  }
+  throw new AuthRequiredError("Not authenticated. Sign in first.");
+}
+
+export function isAuthenticated(): boolean {
+  if (STATIC_TOKEN) return true;
+  if (cachedToken) return true;
+  if (typeof window === "undefined") return false;
+  return !!(sessionStorage.getItem(STORAGE_KEY) || readCookie(TOKEN_COOKIE_NAME));
 }
 
 export function clearAuthToken(): void {
@@ -70,20 +58,75 @@ export function clearAuthToken(): void {
   cachedRestaurant = null;
   if (typeof window !== "undefined") {
     sessionStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(AUTH_TOKEN_KEY);
+    sessionStorage.removeItem(RESTAURANT_STORAGE_KEY);
+    writeCookie(TOKEN_COOKIE_NAME, "", 0);
+    notifyAuthChange();
   }
 }
 
-export function isAuthenticated(): boolean {
-  if (typeof window === "undefined") return false;
-  return !!(
-    STATIC_TOKEN ||
-    localStorage.getItem(AUTH_TOKEN_KEY) ||
-    sessionStorage.getItem(STORAGE_KEY)
-  );
+export function getRestaurant(): RestaurantProfile | null {
+  if (cachedRestaurant) return cachedRestaurant;
+  if (typeof window === "undefined") return null;
+  const raw = sessionStorage.getItem(RESTAURANT_STORAGE_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as RestaurantProfile;
+    cachedRestaurant = parsed;
+    return parsed;
+  } catch {
+    return null;
+  }
 }
 
-async function loginWithDemoCredentials(): Promise<string> {
+function writeRestaurant(restaurant: RestaurantProfile | null) {
+  cachedRestaurant = restaurant;
+  if (typeof window === "undefined") return;
+  if (restaurant) {
+    sessionStorage.setItem(RESTAURANT_STORAGE_KEY, JSON.stringify(restaurant));
+  } else {
+    sessionStorage.removeItem(RESTAURANT_STORAGE_KEY);
+  }
+}
+
+function writeToken(token: string) {
+  cachedToken = token;
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem(STORAGE_KEY, token);
+    writeCookie(TOKEN_COOKIE_NAME, token, COOKIE_MAX_AGE_SECONDS);
+    notifyAuthChange();
+  }
+}
+
+function writeCookie(name: string, value: string, maxAgeSeconds: number) {
+  if (typeof document === "undefined") return;
+  const isSecure =
+    typeof window !== "undefined" && window.location.protocol === "https:";
+  const parts = [
+    `${name}=${encodeURIComponent(value)}`,
+    "path=/",
+    `max-age=${maxAgeSeconds}`,
+    "samesite=lax",
+  ];
+  if (isSecure) parts.push("secure");
+  document.cookie = parts.join("; ");
+}
+
+function readCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp("(?:^|; )" + name + "=([^;]*)"));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function notifyAuthChange() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("menugap:auth-change"));
+  }
+}
+
+export async function loginWithCredentials(
+  email: string,
+  password: string,
+): Promise<string> {
   if (!API_BASE_URL) throw new Error("NEXT_PUBLIC_API_BASE_URL is not set");
 
   const res = await fetch(`${API_BASE_URL}/login`, {
@@ -92,22 +135,41 @@ async function loginWithDemoCredentials(): Promise<string> {
     body: JSON.stringify({ user: { email, password } }),
   });
 
+  // 401 is unambiguous — bad credentials.
   if (res.status === 401) {
     throw new Error("Invalid email or password.");
   }
+
+  // The Render backend quirkily returns HTTP 422 alongside a valid token on
+  // success, so we parse the body regardless of status code and treat the
+  // presence of a `token` as the source of truth.
+  let data: LoginResponse | null = null;
+  try {
+    data = (await res.json()) as LoginResponse;
+  } catch {
+    // Body wasn't JSON — fall through to error handling.
+  }
+
+  if (data?.token) {
+    writeToken(data.token);
+    const restaurant = extractRestaurant(data);
+    if (restaurant) writeRestaurant(restaurant);
+    return data.token;
+  }
+
+  // No token + non-2xx → bubble up a useful error message if the server
+  // provided one, otherwise the status line.
   if (!res.ok) {
-    throw new Error(`Login failed: ${res.status} ${res.statusText}`);
+    const serverMessage =
+      data && typeof (data as { error?: unknown }).error === "string"
+        ? (data as { error: string }).error
+        : data && typeof (data as { message?: unknown }).message === "string"
+          ? (data as { message: string }).message
+          : null;
+    throw new Error(serverMessage ?? `Login failed: ${res.status} ${res.statusText}`);
   }
 
-  const data = (await res.json()) as LoginResponse;
-  if (!data.token) {
-    throw new Error("Login response did not include a token.");
-  }
-
-  writeToken(data.token);
-  const restaurant = extractRestaurant(data);
-  if (restaurant) writeRestaurant(restaurant);
-  return data.token;
+  throw new Error("Login response did not include a token.");
 }
 
 // Defensive parse — accept several common response shapes for the restaurant
@@ -116,9 +178,13 @@ interface LoginResponse {
   token?: string;
   restaurant?: { id?: number | string; name?: string };
   cafe?: { id?: number | string; name?: string };
+  cafes?: Array<{ id?: number | string; name?: string }>;
+  restaurants?: Array<{ id?: number | string; name?: string }>;
   user?: {
     restaurant?: { id?: number | string; name?: string };
     cafe?: { id?: number | string; name?: string };
+    cafes?: Array<{ id?: number | string; name?: string }>;
+    restaurants?: Array<{ id?: number | string; name?: string }>;
     restaurant_name?: string;
     cafe_name?: string;
     cafe_id?: number | string;
@@ -128,8 +194,12 @@ interface LoginResponse {
 
 function extractRestaurant(data: LoginResponse): RestaurantProfile | null {
   const candidates: Array<{ id?: number | string; name?: string } | undefined> = [
+    data.cafes?.[0],
+    data.restaurants?.[0],
     data.restaurant,
     data.cafe,
+    data.user?.cafes?.[0],
+    data.user?.restaurants?.[0],
     data.user?.restaurant,
     data.user?.cafe,
     data.user

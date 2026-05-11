@@ -23,27 +23,27 @@ const SEGMENTS: SegmentConfig[] = [
     label: "Underpriced",
     description: "Room to raise",
     fill: "#34d399",
-    chipBorder: "border-emerald-400/30",
-    chipBg: "bg-emerald-500/10",
-    text: "text-emerald-300",
+    chipBorder: "border-[#CFE4D7]",
+    chipBg: "bg-[#EDF5F0]",
+    text: "text-[#5F8D73]",
   },
   {
     key: "fair",
     label: "Fair",
     description: "Market-aligned",
     fill: "#fbbf24",
-    chipBorder: "border-amber-400/30",
-    chipBg: "bg-amber-500/10",
-    text: "text-amber-300",
+    chipBorder: "border-[#EBD9B6]",
+    chipBg: "bg-[#FBF1E1]",
+    text: "text-[#C38B59]",
   },
   {
     key: "overpriced",
     label: "Overpriced",
     description: "Above market",
     fill: "#fb7185",
-    chipBorder: "border-rose-400/30",
-    chipBg: "bg-rose-500/10",
-    text: "text-rose-300",
+    chipBorder: "border-[#EBCEC4]",
+    chipBg: "bg-[#F8ECE8]",
+    text: "text-[#D57A66]",
   },
 ];
 
@@ -68,7 +68,7 @@ export function PricingDistributionGauge({ data }: { data: DashboardData }) {
           </p>
         </div>
         <span
-          className="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/10 text-xs text-muted-foreground"
+          className="px-2.5 py-1 rounded-full bg-[#F4ECE3] border border-[#E7DED2] text-xs text-muted-foreground"
           style={{ fontWeight: 600 }}
         >
           {total} {total === 1 ? "item" : "items"}
@@ -175,7 +175,7 @@ function renderCalloutLabel(total: number) {
 function SegmentChip({ config }: { config: SegmentConfig }) {
   return (
     <div
-      className={`rounded-xl border ${config.chipBorder} ${config.chipBg} px-4 py-3 flex flex-col gap-1 backdrop-blur-sm transition-colors hover:bg-white/[0.04]`}
+      className={`rounded-xl border ${config.chipBorder} ${config.chipBg} px-4 py-3 flex flex-col gap-1 backdrop-blur-sm transition-colors hover:bg-[#FCF8F3]`}
     >
       <div className="flex items-center gap-2">
         <span

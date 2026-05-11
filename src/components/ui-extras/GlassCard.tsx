@@ -29,7 +29,7 @@ export function GlassCard({
   return (
     <div
       onClick={onClick}
-      className={`${base} ${hover} rounded-2xl ${className}`}
+      className={`${base} ${hover} rounded-[28px] ${className}`}
       style={style}
     >
       {children}

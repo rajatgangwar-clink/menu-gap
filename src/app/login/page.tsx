@@ -36,9 +36,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-6 relative overflow-hidden">
-      <div className="pointer-events-none absolute -top-32 -right-32 w-[480px] h-[480px] rounded-full bg-indigo-200/40 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 -left-32 w-[420px] h-[420px] rounded-full bg-violet-200/40 blur-3xl" />
-
       <div className="relative w-full max-w-md">
         <div className="flex items-center gap-2 justify-center mb-8">
           <div
@@ -52,7 +49,7 @@ export default function LoginPage() {
           </span>
         </div>
 
-        <div className="bg-card rounded-2xl border border-border p-8 shadow-xl shadow-indigo-500/5">
+        <div className="bg-card rounded-2xl border border-border p-8 shadow-xl shadow-[0_8px_32px_rgba(127,85,57,0.08)]">
           <div className="mb-6">
             <h1 className="mb-1">Welcome back</h1>
             <p className="text-sm text-muted-foreground">
@@ -79,7 +76,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@cafe.com"
-                  className="w-full pl-10 pr-4 py-2.5 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 text-sm"
+                  className="w-full pl-10 pr-4 py-2.5 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-[#B08968] text-sm"
                 />
               </div>
             </div>
@@ -102,13 +99,13 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 text-sm"
+                  className="w-full pl-10 pr-4 py-2.5 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-[#B08968] text-sm"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">
+              <div className="text-sm text-[#D57A66] bg-[#F8ECE8] border border-[#EBCEC4] rounded-lg px-3 py-2">
                 {error}
               </div>
             )}

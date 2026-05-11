@@ -5,128 +5,116 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ───────────────────────────────────────────────────────────────────────────
-   Aurora Glass — dark immersive palette
-   The whole product runs in a permanently dark aesthetic with translucent
-   "glass" cards layered over an animated aurora gradient. Light-mode tokens
-   below mirror the dark ones so any component that reads :root values still
-   gets the dark palette without conditional logic.
+   Sandstone / Beige Luxury — warm premium restaurant aesthetic
+   Inspired by Notion AI, Resy, Michelin admin tools, boutique hotel
+   dashboards. The product is always Sandstone; .dark mirrors :root so
+   toggling does nothing.
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
   --font-size: 16px;
 
-  /* Deep aurora canvas */
-  --background: #06070f;
-  --foreground: #f5f6ff;
+  --background: #F6F1E8;
+  --foreground: #2D2420;
 
-  /* Glass surface — used by Card components, sidebar, headers */
-  --card: rgba(255, 255, 255, 0.04);
-  --card-foreground: #f5f6ff;
-  --card-border: rgba(255, 255, 255, 0.08);
-  --card-glow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 12px 32px -12px rgba(0, 0, 0, 0.6);
+  --card: #FFFDF9;
+  --card-foreground: #2D2420;
+  --card-border: #E7DED2;
+  --card-glow: 0 4px 18px rgba(0, 0, 0, 0.04);
 
-  --popover: #11122a;
-  --popover-foreground: #f5f6ff;
+  --popover: #FFFDF9;
+  --popover-foreground: #2D2420;
 
-  --primary: #8b5cf6;
-  --primary-foreground: #ffffff;
+  --primary: #B08968;
+  --primary-foreground: #FFFDF9;
 
-  --secondary: rgba(255, 255, 255, 0.06);
-  --secondary-foreground: #f5f6ff;
+  --secondary: #FCF8F3;
+  --secondary-foreground: #2D2420;
 
-  --muted: rgba(255, 255, 255, 0.05);
-  --muted-foreground: #a4a8c5;
+  --muted: #FCF8F3;
+  --muted-foreground: #7A6D65;
 
-  --accent: rgba(139, 92, 246, 0.14);
-  --accent-foreground: #f5f6ff;
+  --accent: #F4ECE3;
+  --accent-foreground: #7F5539;
 
-  --destructive: #f43f5e;
-  --destructive-foreground: #ffffff;
+  --destructive: #D57A66;
+  --destructive-foreground: #FFFDF9;
 
-  --border: rgba(255, 255, 255, 0.08);
-  --input: transparent;
-  --input-background: rgba(255, 255, 255, 0.04);
-  --switch-background: rgba(255, 255, 255, 0.12);
+  --border: #E7DED2;
+  --input: #E5D9CC;
+  --input-background: #FCF8F3;
+  --switch-background: #E7DED2;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #a78bfa;
+  --ring: #B08968;
 
-  /* Chart palette tuned for dark backgrounds */
-  --chart-1: #a78bfa;
-  --chart-2: #34d399;
-  --chart-3: #38bdf8;
-  --chart-4: #fbbf24;
-  --chart-5: #f472b6;
+  --chart-1: #B08968;
+  --chart-2: #5F8D73;
+  --chart-3: #DDB892;
+  --chart-4: #C38B59;
+  --chart-5: #D57A66;
 
   --radius: 1rem;
 
-  /* Sidebar mirrors card — translucent glass over the aurora */
-  --sidebar: rgba(10, 12, 28, 0.55);
-  --sidebar-foreground: #f5f6ff;
-  --sidebar-primary: #8b5cf6;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(139, 92, 246, 0.16);
-  --sidebar-accent-foreground: #f5f6ff;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #a78bfa;
+  --sidebar: #F2EAD9;
+  --sidebar-foreground: #2D2420;
+  --sidebar-primary: #B08968;
+  --sidebar-primary-foreground: #FFFDF9;
+  --sidebar-accent: #F4ECE3;
+  --sidebar-accent-foreground: #7F5539;
+  --sidebar-border: #E7DED2;
+  --sidebar-ring: #B08968;
 
-  /* Status pills on dark glass */
-  --status-positive: rgba(16, 185, 129, 0.18);
-  --status-positive-foreground: #6ee7b7;
-  --status-caution: rgba(245, 158, 11, 0.18);
-  --status-caution-foreground: #fcd34d;
-  --status-negative: rgba(244, 63, 94, 0.2);
-  --status-negative-foreground: #fda4af;
-
-  /* Brand gradient stops used across heroes / accents */
-  --aurora-violet: #6d28d9;
-  --aurora-indigo: #4338ca;
-  --aurora-cyan: #06b6d4;
-  --aurora-pink: #db2777;
+  /* Status pills — tone-on-tone soft tints */
+  --status-positive: #EDF5F0;
+  --status-positive-foreground: #5F8D73;
+  --status-caution: #FBF1E1;
+  --status-caution-foreground: #C38B59;
+  --status-negative: #F8ECE8;
+  --status-negative-foreground: #D57A66;
 }
 
-/* Mirror the dark palette here so toggling `.dark` is a no-op — the whole app
-   is always dark. */
+/* Mirror :root so the .dark class is a no-op. */
 .dark {
-  --background: #06070f;
-  --foreground: #f5f6ff;
-  --card: rgba(255, 255, 255, 0.04);
-  --card-foreground: #f5f6ff;
-  --popover: #11122a;
-  --popover-foreground: #f5f6ff;
-  --primary: #8b5cf6;
-  --primary-foreground: #ffffff;
-  --secondary: rgba(255, 255, 255, 0.06);
-  --secondary-foreground: #f5f6ff;
-  --muted: rgba(255, 255, 255, 0.05);
-  --muted-foreground: #a4a8c5;
-  --accent: rgba(139, 92, 246, 0.14);
-  --accent-foreground: #f5f6ff;
-  --destructive: #f43f5e;
-  --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.06);
-  --input-background: rgba(255, 255, 255, 0.04);
-  --switch-background: rgba(255, 255, 255, 0.12);
-  --ring: #a78bfa;
-  --chart-1: #a78bfa;
-  --chart-2: #34d399;
-  --chart-3: #38bdf8;
-  --chart-4: #fbbf24;
-  --chart-5: #f472b6;
-  --sidebar: rgba(10, 12, 28, 0.55);
-  --sidebar-foreground: #f5f6ff;
-  --sidebar-primary: #8b5cf6;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(139, 92, 246, 0.16);
-  --sidebar-accent-foreground: #f5f6ff;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #a78bfa;
-  --status-positive: rgba(16, 185, 129, 0.18);
-  --status-positive-foreground: #6ee7b7;
-  --status-caution: rgba(245, 158, 11, 0.18);
-  --status-caution-foreground: #fcd34d;
-  --status-negative: rgba(244, 63, 94, 0.2);
-  --status-negative-foreground: #fda4af;
+  --background: #F6F1E8;
+  --foreground: #2D2420;
+  --card: #FFFDF9;
+  --card-foreground: #2D2420;
+  --popover: #FFFDF9;
+  --popover-foreground: #2D2420;
+  --primary: #B08968;
+  --primary-foreground: #FFFDF9;
+  --secondary: #FCF8F3;
+  --secondary-foreground: #2D2420;
+  --muted: #FCF8F3;
+  --muted-foreground: #7A6D65;
+  --accent: #F4ECE3;
+  --accent-foreground: #7F5539;
+  --destructive: #D57A66;
+  --destructive-foreground: #FFFDF9;
+  --border: #E7DED2;
+  --input: #E5D9CC;
+  --input-background: #FCF8F3;
+  --switch-background: #E7DED2;
+  --ring: #B08968;
+  --chart-1: #B08968;
+  --chart-2: #5F8D73;
+  --chart-3: #DDB892;
+  --chart-4: #C38B59;
+  --chart-5: #D57A66;
+  --sidebar: #F2EAD9;
+  --sidebar-foreground: #2D2420;
+  --sidebar-primary: #B08968;
+  --sidebar-primary-foreground: #FFFDF9;
+  --sidebar-accent: #F4ECE3;
+  --sidebar-accent-foreground: #7F5539;
+  --sidebar-border: #E7DED2;
+  --sidebar-ring: #B08968;
+  --status-positive: #EDF5F0;
+  --status-positive-foreground: #5F8D73;
+  --status-caution: #FBF1E1;
+  --status-caution-foreground: #C38B59;
+  --status-negative: #F8ECE8;
+  --status-negative-foreground: #D57A66;
 }
 
 @theme inline {
@@ -196,7 +184,7 @@
   }
 
   html, body {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   body {
@@ -239,99 +227,50 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   Animations — ambient & gentle
+   Animations — kept minimal (Sandstone uses only hover transitions, but the
+   existing components still reference these classes so we keep them defined
+   as no-ops so nothing breaks visually).
    ─────────────────────────────────────────────────────────────────────────── */
-@keyframes aurora-drift {
-  0%   { transform: translate3d(-6%, -4%, 0) rotate(0deg) scale(1.05); }
-  50%  { transform: translate3d( 4%,  6%, 0) rotate(8deg) scale(1.15); }
-  100% { transform: translate3d(-6%, -4%, 0) rotate(0deg) scale(1.05); }
-}
-
-@keyframes aurora-drift-slow {
-  0%   { transform: translate3d(8%, 6%, 0) scale(1.1); }
-  50%  { transform: translate3d(-6%, -8%, 0) scale(1.2); }
-  100% { transform: translate3d(8%, 6%, 0) scale(1.1); }
-}
-
 @keyframes fade-rise {
   0%   { opacity: 0; transform: translateY(14px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.0); }
-  50%      { box-shadow: 0 0 36px -6px rgba(167, 139, 250, 0.35); }
-}
-
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes blob-float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50%      { transform: translate(20px, -16px) scale(1.05); }
-}
-
-.aurora-drift   { animation: aurora-drift 24s ease-in-out infinite; }
-.aurora-drift-2 { animation: aurora-drift-slow 32s ease-in-out infinite; }
 .fade-rise      { animation: fade-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.glow-pulse     { animation: glow-pulse 4.5s ease-in-out infinite; }
-.blob-float     { animation: blob-float 14s ease-in-out infinite; }
+.aurora-drift   { animation: none; }
+.aurora-drift-2 { animation: none; }
+.glow-pulse     { animation: none; }
+.blob-float     { animation: none; }
 
 .shimmer-text {
-  background-image: linear-gradient(
-    90deg,
-    rgba(245, 246, 255, 0.6) 0%,
-    rgba(245, 246, 255, 1) 50%,
-    rgba(245, 246, 255, 0.6) 100%
-  );
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shimmer 6s linear infinite;
+  color: var(--foreground);
 }
 
-/* Reusable glass surface — translucent, blurred, faintly bordered */
+/* Sandstone "glass" surface — flat cream card with a soft drop shadow.
+   No backdrop-filter (Sandstone is intentionally flat). */
 .glass {
   background: var(--card);
-  border: 1px solid var(--card-border);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--border);
   box-shadow: var(--card-glow);
 }
 
 .glass-strong {
-  background: rgba(20, 22, 44, 0.5);
-  border: 1px solid var(--card-border);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  box-shadow: var(--card-glow);
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-/* Hover lift — used on interactive cards */
+/* Hover lift — sandstone uses simple border + bg shifts, no transforms. */
 .hover-lift {
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-              border-color 0.4s ease;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 .hover-lift:hover {
-  transform: translateY(-3px);
-  border-color: rgba(167, 139, 250, 0.35);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset,
-              0 24px 48px -16px rgba(76, 29, 149, 0.45),
-              0 0 0 1px rgba(167, 139, 250, 0.2);
+  border-color: #B08968;
+  background-color: #FCF8F3;
 }
 
-/* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
-  .aurora-drift,
-  .aurora-drift-2,
-  .fade-rise,
-  .glow-pulse,
-  .blob-float,
-  .shimmer-text {
+  .fade-rise {
     animation: none !important;
   }
   .hover-lift {

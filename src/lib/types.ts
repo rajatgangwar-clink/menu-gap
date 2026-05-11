@@ -3,15 +3,43 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type TrendDirection = "rising" | "falling" | "stable";
+export type DirectionLabel = "Rising Quickly" | "Holding Steady" | "Cooling Down";
+export type TrendLevel =
+  | "exploding"
+  | "strong_trend"
+  | "trending"
+  | "stable_interest";
+export type Priority = "high" | "medium" | "low";
+export type TrendGroup = "rising_fast" | "high_demand_staples" | "other";
+export type OpportunityLabel =
+  | "High Demand Gap"
+  | "Strong Opportunity"
+  | "Worth Considering"
+  | string;
+export type PerformanceLabel =
+  | "Top Performer"
+  | "Reliable Item"
+  | "Needs Attention"
+  | string;
+export type ReadinessLabel = "Ready to Add" | string;
 export type PriceLabel = "underpriced" | "fair" | "overpriced";
 export type PerformanceStatus = "Excellent" | "Good" | "Average" | "Poor";
 
 export interface ApiTrendingItem {
   canonical_dish_id: number;
   display_name: string;
-  trend_score: number;
+  cuisine_type: string | null;
+  category: string | null;
+  growth_rate: number;
   direction: TrendDirection;
   served_by_cafe: boolean;
+  trend_level: TrendLevel;
+  trend_label: string;
+  priority: Priority;
+  direction_label: DirectionLabel;
+  owner_message: string;
+  recommended_action: string;
+  groups?: TrendGroup[];
 }
 
 export interface ApiMustHaveItem {
@@ -20,22 +48,20 @@ export interface ApiMustHaveItem {
   avg_rating: number;
   total_reviews: number;
   competitor_count: number;
-  must_have_score: number;
+  opportunity_label: OpportunityLabel;
 }
 
 export interface ApiPerformerItem {
   menu_item_id: number;
   name: string;
-  performance_score: number;
+  performance_label: PerformanceLabel;
   rating: string;
   review_count: number;
-  trend_score: number;
 }
 
 export interface ApiNoveltyItem {
   global_dish_name: string;
-  novelty_score: number;
-  overlap_ratio: number;
+  readiness_label: ReadinessLabel;
   missing_ingredients: string[];
 }
 
@@ -52,9 +78,15 @@ export interface ApiDishRanking {
   group_size: number;
 }
 
+// Backend now groups trending into rising/falling. Older deployments may
+// still send a flat array, so accept both shapes.
+export type ApiTrendingPayload =
+  | ApiTrendingItem[]
+  | { rising?: ApiTrendingItem[]; falling?: ApiTrendingItem[] };
+
 export interface ApiDashboardResponse {
   cafe_id: number;
-  trending: ApiTrendingItem[];
+  trending: ApiTrendingPayload;
   must_haves: ApiMustHaveItem[];
   best_performers: ApiPerformerItem[];
   worst_performers: ApiPerformerItem[];
@@ -69,9 +101,20 @@ export interface ApiDashboardResponse {
 export interface TrendingItem {
   canonicalDishId: number;
   name: string;
-  trendScore: number;
+  cuisineType: string | null;
+  category: string | null;
+  growthRate: number;
   direction: TrendDirection;
   servedByCafe: boolean;
+  trendLevel: TrendLevel;
+  trendLabel: string;
+  priority: Priority;
+  directionLabel: DirectionLabel;
+  ownerMessage: string;
+  recommendedAction: string;
+  groups: TrendGroup[];
+  /** Derived 0–100 score so legacy UI elements (progress bars, sort) keep working. */
+  trendScore: number;
 }
 
 export interface MustHaveItem {
@@ -80,23 +123,29 @@ export interface MustHaveItem {
   avgRating: number;
   totalReviews: number;
   competitorCount: number;
+  opportunityLabel: OpportunityLabel;
+  /** Derived 0–100 score from `opportunity_label`. */
   mustHaveScore: number;
 }
 
 export interface PerformerItem {
   menuItemId: number;
   name: string;
-  performanceScore: number;
+  performanceLabel: PerformanceLabel;
   rating: number;
   reviewCount: number;
-  trendScore: number;
+  /** Derived 0–100 score from `performance_label`. */
+  performanceScore: number;
 }
 
 export interface NoveltyItem {
   name: string;
-  noveltyScore: number;
-  overlapRatio: number;
+  readinessLabel: ReadinessLabel;
   missingIngredients: string[];
+  /** Derived 0–100 score so existing visuals work. */
+  noveltyScore: number;
+  /** Derived 0–1 pantry match from missing-ingredient count. */
+  overlapRatio: number;
 }
 
 export interface DishRanking {
@@ -137,7 +186,10 @@ export interface ChatSession {
   id: string;
   title: string;
   lastMessage: string;
+  /** Human-friendly relative label (e.g. "5m ago"). */
   timestamp: string;
+  /** Raw ISO timestamp from the backend — used for filter/sort. May be empty. */
+  updatedAt: string;
   messages: ChatMessage[];
 }
 

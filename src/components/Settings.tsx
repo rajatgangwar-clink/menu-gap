@@ -44,16 +44,12 @@ export function Settings() {
         </Reveal>
 
         <Reveal delay={440}>
-          <div className="relative rounded-2xl overflow-hidden border border-rose-400/30 glass">
-            <div
-              aria-hidden
-              className="absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl opacity-25 bg-rose-500"
-            />
-            <div className="relative p-6 border-b border-rose-400/20 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-400/30 flex items-center justify-center">
-                <Shield className="w-5 h-5 text-rose-300" />
+          <div className="relative rounded-2xl overflow-hidden border border-[#EBCEC4] glass">
+            <div className="relative p-6 border-b border-[#EBCEC4] flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#F8ECE8] border border-[#EBCEC4] flex items-center justify-center">
+                <Shield className="w-5 h-5 text-[#D57A66]" />
               </div>
-              <h3 className="text-rose-300">Danger Zone</h3>
+              <h3 className="text-[#D57A66]">Danger Zone</h3>
             </div>
             <div className="relative p-6">
               <div className="flex items-center justify-between">
@@ -66,7 +62,7 @@ export function Settings() {
                   </div>
                 </div>
                 <button
-                  className="px-4 py-2 text-sm bg-gradient-to-r from-rose-500 to-fuchsia-500 text-white rounded-lg hover:opacity-90 transition-opacity shadow-lg shadow-rose-900/40"
+                  className="px-4 py-2 text-sm bg-[#D57A66] text-white rounded-lg hover:opacity-90 transition-opacity shadow-[0_4px_12px_rgba(213,122,102,0.25)]"
                   style={{ fontWeight: 600 }}
                 >
                   Delete Account
@@ -85,24 +81,24 @@ const ACCENTS: Record<
   { iconBg: string; iconColor: string; glow: string }
 > = {
   violet: {
-    iconBg: "bg-violet-500/15 border-violet-400/30",
-    iconColor: "text-violet-300",
-    glow: "bg-violet-500",
+    iconBg: "bg-[#F4ECE3] border-[#E7DED2]",
+    iconColor: "text-[#B08968]",
+    glow: "bg-[#7F5539]",
   },
   cyan: {
-    iconBg: "bg-cyan-500/15 border-cyan-400/30",
-    iconColor: "text-cyan-300",
-    glow: "bg-cyan-500",
+    iconBg: "bg-[#DDB892]/15 border-[#CFE4D7]",
+    iconColor: "text-[#5F8D73]",
+    glow: "bg-[#DDB892]",
   },
   amber: {
-    iconBg: "bg-amber-500/15 border-amber-400/30",
-    iconColor: "text-amber-300",
-    glow: "bg-amber-500",
+    iconBg: "bg-[#FBF1E1] border-[#EBD9B6]",
+    iconColor: "text-[#C38B59]",
+    glow: "bg-[#C38B59]",
   },
   emerald: {
-    iconBg: "bg-emerald-500/15 border-emerald-400/30",
-    iconColor: "text-emerald-300",
-    glow: "bg-emerald-500",
+    iconBg: "bg-[#EDF5F0] border-[#CFE4D7]",
+    iconColor: "text-[#5F8D73]",
+    glow: "bg-[#5F8D73]",
   },
 };
 
@@ -120,10 +116,6 @@ function SettingsCard({
   const cfg = ACCENTS[accent];
   return (
     <GlassCard className="overflow-hidden relative">
-      <div
-        aria-hidden
-        className={`absolute -top-12 -right-12 w-40 h-40 rounded-full blur-3xl opacity-20 ${cfg.glow}`}
-      />
       <div className="relative p-6 border-b border-border flex items-center gap-3">
         <div
           className={`w-9 h-9 rounded-xl flex items-center justify-center border ${cfg.iconBg} ${cfg.iconColor}`}
@@ -147,7 +139,7 @@ function Row({ label, value, action }: { label: string; value: string; action: s
           </div>
           <div className="text-sm text-muted-foreground">{value}</div>
         </div>
-        <button className="px-4 py-2 text-sm border border-white/10 bg-white/[0.03] rounded-lg hover:bg-white/[0.07] hover:border-violet-400/30 transition-all">
+        <button className="px-4 py-2 text-sm border border-[#E7DED2] bg-[#FCF8F3] rounded-lg hover:bg-[#F4ECE3] hover:border-[#E7DED2] transition-all">
           {action}
         </button>
       </div>
@@ -175,7 +167,7 @@ function Toggle({
         </div>
         <label className="relative inline-flex items-center cursor-pointer">
           <input type="checkbox" className="sr-only peer" defaultChecked={defaultChecked} />
-          <div className="w-11 h-6 bg-white/[0.12] rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-violet-500 peer-checked:to-fuchsia-500 peer-checked:shadow-lg peer-checked:shadow-violet-900/40 transition-all peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-transform after:shadow-md"></div>
+          <div className="w-11 h-6 bg-[#E7DED2] rounded-full peer peer-checked:bg-[#B08968] peer-checked:shadow-lg peer-checked:shadow-[0_4px_12px_rgba(127,85,57,0.25)] transition-all peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-transform after:shadow-md"></div>
         </label>
       </div>
     </div>

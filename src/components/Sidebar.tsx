@@ -9,14 +9,13 @@ import {
   Sparkles,
   HelpCircle,
   Settings as SettingsIcon,
-  ChevronDown,
-  User,
-  MoreVertical,
-  MessageCircle,
   LogOut,
+  User,
+  MessageCircle,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { LogoutButton } from "./LogoutButton";
+import { useRouter } from "next/navigation";
+import { clearAuthToken } from "@/lib/auth";
+import { useRestaurant } from "@/hooks/use-restaurant";
 
 type NavItem = {
   href: string;
@@ -50,43 +49,30 @@ const navGroups: NavGroup[] = [
   },
 ];
 
-const stores = [
-  "The Daily Grind - HSR Layout",
-  "The Daily Grind - Koramangala",
-  "The Daily Grind - Indiranagar",
-];
-
 export function Sidebar() {
   const pathname = usePathname();
-  const [storeSwitcherOpen, setStoreSwitcherOpen] = useState(false);
-  const [selectedStore, setSelectedStore] = useState(stores[0]);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const restaurant = useRestaurant();
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setStoreSwitcherOpen(false);
-      }
-    }
-    if (storeSwitcherOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [storeSwitcherOpen]);
+  const handleLogout = () => {
+    clearAuthToken();
+    router.replace("/login");
+  };
+
+  const restaurantName = restaurant?.name ?? "Your Restaurant";
 
   return (
     <div className="relative w-64 h-screen flex flex-col glass border-r border-sidebar-border overflow-hidden">
       {/* Subtle inner highlight along the right edge */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-violet-400/30 to-transparent"
+        className="pointer-events-none absolute inset-y-0 right-0 w-px bg-[#E7DED2]"
       />
 
       <div className="p-6 pb-4">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 blur-md opacity-60" />
-            <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 via-indigo-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-900/40">
+            <div className="relative w-9 h-9 rounded-xl bg-[#7F5539] flex items-center justify-center shadow-[0_4px_12px_rgba(127,85,57,0.25)]">
               <span className="text-white" style={{ fontWeight: 700 }}>M</span>
             </div>
           </div>
@@ -104,47 +90,18 @@ export function Sidebar() {
           className="px-1 mb-1.5 text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
           style={{ fontWeight: 600 }}
         >
-          Store
+          Restaurant
         </div>
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setStoreSwitcherOpen(!storeSwitcherOpen)}
-            className="w-full flex items-center gap-2 px-2 py-2 rounded-xl border border-white/5 bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/10 transition-all"
+        <div className="flex items-center gap-2 px-1 py-1.5">
+          <span
+            className="w-7 h-7 rounded-full flex-shrink-0 bg-[#B08968] text-white flex items-center justify-center text-xs"
+            style={{ fontWeight: 700 }}
           >
-            <span
-              className="w-7 h-7 rounded-full flex-shrink-0 bg-gradient-to-br from-amber-400 via-rose-400 to-fuchsia-400 text-white flex items-center justify-center text-xs shadow-lg shadow-rose-900/30"
-              style={{ fontWeight: 700 }}
-            >
-              {selectedStore.charAt(0)}
-            </span>
-            <span className="flex-1 text-left text-sm text-sidebar-foreground truncate">
-              {storeShortName(selectedStore)}
-            </span>
-            <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-          </button>
-
-          {storeSwitcherOpen && (
-            // Solid popover surface — backdrop-filter would be blurring the
-            // sidebar's own glass layer (it can't see past a parent stacking
-            // context), so we use the opaque --popover token plus a soft
-            // shadow to read as a floating menu.
-            <div
-              className="absolute top-full left-0 right-0 mt-1.5 rounded-xl border border-white/10 z-50 overflow-hidden bg-popover shadow-xl shadow-black/40 ring-1 ring-white/5"
-            >
-              {stores.map((store) => (
-                <button
-                  key={store}
-                  onClick={() => {
-                    setSelectedStore(store);
-                    setStoreSwitcherOpen(false);
-                  }}
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-white/[0.06] transition-colors"
-                >
-                  {store}
-                </button>
-              ))}
-            </div>
-          )}
+            {restaurantName.charAt(0).toUpperCase()}
+          </span>
+          <span className="flex-1 text-left text-sm text-sidebar-foreground truncate">
+            {restaurantName}
+          </span>
         </div>
       </div>
 
@@ -170,15 +127,13 @@ export function Sidebar() {
                     href={item.href}
                     className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${
                       isActive
-                        ? "text-white"
-                        : "text-sidebar-foreground/80 hover:text-white hover:bg-white/[0.05]"
+                        ? "text-[#FFF8F2]"
+                        : "text-[#5A4F47] hover:text-[#2D2420] hover:bg-[#F4ECE3]"
                     }`}
                   >
                     {isActive && (
                       <>
-                        <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-violet-500/80 via-indigo-500/70 to-fuchsia-500/60 shadow-lg shadow-violet-900/40" />
-                        <span className="absolute inset-0 rounded-xl ring-1 ring-white/20" />
-                        <span className="absolute -inset-px rounded-xl bg-gradient-to-r from-violet-500/30 to-fuchsia-500/30 blur-md opacity-70 -z-10" />
+                        <span className="absolute inset-0 rounded-xl bg-[#7F5539] shadow-[0_4px_12px_rgba(127,85,57,0.25)]" />
                       </>
                     )}
                     <Icon className="relative w-5 h-5 flex-shrink-0" />
@@ -196,8 +151,7 @@ export function Sidebar() {
       <div className="p-4 border-t border-sidebar-border space-y-3">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 blur-md opacity-50" />
-            <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center">
+            <div className="relative w-10 h-10 rounded-full bg-[#7F5539] flex items-center justify-center">
               <User className="w-5 h-5 text-white" />
             </div>
           </div>
@@ -208,17 +162,17 @@ export function Sidebar() {
             <div className="text-xs text-muted-foreground">Owner</div>
           </div>
         </div>
-        <LogoutButton 
-          variant="outline"
-          className="w-full justify-center text-xs"
-        />
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-[#EBCEC4] text-[#D57A66] hover:bg-[#F8ECE8] transition-colors text-sm"
+          style={{ fontWeight: 600 }}
+        >
+          <LogOut className="w-4 h-4" />
+          Logout
+        </button>
       </div>
     </div>
   );
 }
 
-// Strips the "The Daily Grind - " prefix so the visible label is just the location.
-function storeShortName(full: string): string {
-  const parts = full.split(" - ");
-  return parts.length > 1 ? parts.slice(1).join(" - ") : full;
-}

@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronsUpDown, ArrowUp, ArrowDown } from "lucide-react";
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 
 type SortDirection = "asc" | "desc" | null;
 
@@ -39,15 +39,15 @@ type Tone = "primary" | "positive" | "negative" | "neutral";
 
 const toneClasses: Record<Tone, string> = {
   primary: "bg-primary text-primary-foreground hover:bg-primary/90",
-  positive: "bg-emerald-500 text-white hover:bg-emerald-600",
-  negative: "bg-rose-500 text-white hover:bg-rose-600",
+  positive: "bg-[#5F8D73] text-white hover:bg-[#5F8D73]",
+  negative: "bg-[#D57A66] text-white hover:bg-[#D57A66]",
   neutral: "bg-muted text-foreground hover:bg-muted/80",
 };
 
 interface ActionPillProps {
   children: ReactNode;
   tone?: Tone;
-  onClick?: () => void;
+  onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   className?: string;
 }
 
@@ -80,9 +80,9 @@ export function ChangeIndicator({
   const isPositive = value > 0;
   const isNegative = value < 0;
   const tone = isPositive
-    ? "text-emerald-600"
+    ? "text-[#5F8D73]"
     : isNegative
-      ? "text-rose-600"
+      ? "text-[#D57A66]"
       : "text-muted-foreground";
   const Icon = isPositive ? ArrowUp : isNegative ? ArrowDown : null;
   const formatted = `${showSign && isPositive ? "+" : ""}${value.toFixed(2)}%`;

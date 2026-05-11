@@ -55,14 +55,14 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
               placeholder="Search dishes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 text-sm transition-colors"
+              className="w-full pl-10 pr-4 py-2 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-[#B08968]/40 focus:border-[#B08968] text-sm transition-colors"
             />
           </div>
           <div className="relative">
             <button
               type="button"
               onClick={() => setFilterOpen((o) => !o)}
-              className="flex items-center gap-2 px-3 py-2 border border-white/10 bg-white/[0.03] rounded-lg hover:bg-white/[0.06] transition-colors text-sm"
+              className="flex items-center gap-2 px-3 py-2 border border-[#E7DED2] bg-[#FCF8F3] rounded-lg hover:bg-[#F4ECE3] transition-colors text-sm"
             >
               <Filter className="w-4 h-4" />
               <span>{activeFilter.label}</span>
@@ -75,7 +75,7 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
                   onClick={() => setFilterOpen(false)}
                   aria-hidden
                 />
-                <div className="absolute right-0 top-full mt-1 w-44 glass-strong rounded-lg border border-white/10 z-50 py-1">
+                <div className="absolute right-0 top-full mt-1 w-44 glass-strong rounded-lg border border-[#E7DED2] z-50 py-1">
                   {FILTER_OPTIONS.map((opt) => (
                     <button
                       key={opt.key}
@@ -84,14 +84,14 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
                         setStatusFilter(opt.key);
                         setFilterOpen(false);
                       }}
-                      className={`w-full text-left px-3 py-2 text-sm hover:bg-white/[0.06] transition-colors flex items-center justify-between ${
-                        statusFilter === opt.key ? "text-violet-300" : "text-foreground"
+                      className={`w-full text-left px-3 py-2 text-sm hover:bg-[#F4ECE3] transition-colors flex items-center justify-between ${
+                        statusFilter === opt.key ? "text-[#B08968]" : "text-foreground"
                       }`}
                       style={{ fontWeight: statusFilter === opt.key ? 600 : 500 }}
                     >
                       {opt.label}
                       {statusFilter === opt.key && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-violet-400 shadow-[0_0_8px] shadow-violet-400/60" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#B08968]" />
                       )}
                     </button>
                   ))}
@@ -102,10 +102,18 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
         </div>
       </div>
       <div className="flex-1 overflow-y-auto" style={{ maxHeight: 280 }}>
-      <Table>
+      <Table className="table-fixed">
         <TableHeader>
-          <TableRow className="bg-white/[0.03] hover:bg-white/[0.03] sticky top-0 z-10 backdrop-blur-md">
-            <TableHead className="pl-6">
+          <TableRow className="bg-muted/40 hover:bg-muted/40">
+            <TableHead className="sticky top-0 z-10 bg-popover w-16 pl-6">
+              <span
+                className="text-xs uppercase tracking-wider text-muted-foreground"
+                style={{ fontWeight: 600 }}
+              >
+                #
+              </span>
+            </TableHead>
+            <TableHead className="sticky top-0 z-10 bg-popover">
               <span
                 className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
                 style={{ fontWeight: 600 }}
@@ -113,15 +121,15 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
                 Dish
               </span>
             </TableHead>
-            <TableHead className="text-center">
+            <TableHead className="sticky top-0 z-10 bg-popover text-right w-[88px]">
               <span
                 className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
                 style={{ fontWeight: 600 }}
               >
-                Price
+                My Price
               </span>
             </TableHead>
-            <TableHead className="text-center">
+            <TableHead className="sticky top-0 z-10 bg-popover text-right w-[100px]">
               <span
                 className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
                 style={{ fontWeight: 600 }}
@@ -129,7 +137,7 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
                 Market
               </span>
             </TableHead>
-            <TableHead className="text-center pr-6">
+            <TableHead className="sticky top-0 z-10 bg-popover text-center pr-6 w-[140px]">
               <span
                 className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
                 style={{ fontWeight: 600 }}
@@ -142,22 +150,28 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
         <TableBody>
           {filtered.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center py-8 text-sm text-muted-foreground">
+              <TableCell colSpan={5} className="text-center py-8 text-sm text-muted-foreground">
                 No matching items.
               </TableCell>
             </TableRow>
           ) : (
-            filtered.map((r) => (
-              <TableRow key={r.menuItemId} className="border-border hover:bg-white/[0.03]">
-                <TableCell className="pl-6">
+            filtered.map((r, index) => (
+              <TableRow key={r.menuItemId} className="border-border">
+                <TableCell
+                  className="pl-6 text-sm text-muted-foreground"
+                  style={{ fontWeight: 600 }}
+                >
+                  {index + 1}
+                </TableCell>
+                <TableCell>
                   <div className="text-sm truncate" style={{ fontWeight: 600 }}>
                     {r.name}
                   </div>
                 </TableCell>
-                <TableCell className="text-center text-sm" style={{ fontWeight: 600 }}>
+                <TableCell className="text-right text-sm tabular-nums" style={{ fontWeight: 600 }}>
                   ₹{r.price.toFixed(0)}
                 </TableCell>
-                <TableCell className="text-center text-sm text-muted-foreground">
+                <TableCell className="text-right text-sm text-muted-foreground tabular-nums">
                   ₹{r.avgGroupPrice.toFixed(0)}
                 </TableCell>
                 <TableCell className="text-center pr-6">
@@ -178,24 +192,24 @@ export function PricingStatusList({ data }: { data: DashboardData }) {
 function StatusBadge({ label }: { label: PriceLabel }) {
   const map = {
     underpriced: {
-      bg: "bg-emerald-500/15",
-      border: "border-emerald-400/30",
-      dot: "bg-emerald-400 shadow-[0_0_8px] shadow-emerald-400/70",
-      text: "text-emerald-300",
+      bg: "bg-[#EDF5F0]",
+      border: "border-[#CFE4D7]",
+      dot: "bg-[#5F8D73]",
+      text: "text-[#5F8D73]",
       label: "Underpriced",
     },
     fair: {
-      bg: "bg-amber-500/15",
-      border: "border-amber-400/30",
-      dot: "bg-amber-400 shadow-[0_0_8px] shadow-amber-400/70",
-      text: "text-amber-300",
+      bg: "bg-[#FBF1E1]",
+      border: "border-[#EBD9B6]",
+      dot: "bg-[#C38B59]",
+      text: "text-[#C38B59]",
       label: "Fair",
     },
     overpriced: {
-      bg: "bg-rose-500/15",
-      border: "border-rose-400/30",
-      dot: "bg-rose-400 shadow-[0_0_8px] shadow-rose-400/70",
-      text: "text-rose-300",
+      bg: "bg-[#F8ECE8]",
+      border: "border-[#EBCEC4]",
+      dot: "bg-[#D57A66]",
+      text: "text-[#D57A66]",
       label: "Overpriced",
     },
   } as const;

@@ -19,8 +19,10 @@ export function MenuCoverageDonut({ data }: { data: DashboardData }) {
           { name: "Served", value: served },
           { name: "Gap", value: gaps },
         ];
-  // Bright violet "served" arc against a muted track on dark glass.
-  const colors = total === 0 ? ["rgba(255,255,255,0.06)"] : ["#a78bfa", "rgba(255,255,255,0.08)"];
+  // Sandstone tan for what's covered; terracotta for the gap so a low
+  // coverage % (e.g. 16%) reads as a clear "opportunity" slice instead of
+  // disappearing into the cream card.
+  const colors = total === 0 ? ["#E7DED2"] : ["#7F5539", "#D57A66"];
 
   return (
     <GlassCard className="p-6 flex flex-col h-full">
@@ -53,7 +55,7 @@ export function MenuCoverageDonut({ data }: { data: DashboardData }) {
         </ResponsiveContainer>
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           <div
-            className="text-4xl tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-violet-200 to-fuchsia-300"
+            className="text-4xl tracking-tight text-[#B08968]"
             style={{ fontWeight: 800 }}
           >
             <CountUp to={pct} format={(v) => `${Math.round(v)}%`} />
@@ -65,8 +67,8 @@ export function MenuCoverageDonut({ data }: { data: DashboardData }) {
       </div>
 
       <div className="grid grid-cols-2 gap-3 pt-4 border-t border-border mt-2">
-        <LegendStat dotColor="bg-violet-400 shadow-[0_0_10px] shadow-violet-400/60" label="On menu" value={served.toString()} />
-        <LegendStat dotColor="bg-white/20" label="Gap" value={gaps.toString()} />
+        <LegendStat dotColor="bg-[#7F5539]" label="On menu" value={served.toString()} />
+        <LegendStat dotColor="bg-[#D57A66]" label="Gap" value={gaps.toString()} />
       </div>
     </GlassCard>
   );

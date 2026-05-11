@@ -16,19 +16,11 @@ export function FAQs() {
         <PageHeader title="FAQs" subtitle="Frequently asked questions about Menu Gap" />
 
         <Reveal delay={120}>
-          <div className="relative overflow-hidden rounded-2xl border border-white/10 p-6 glass-strong">
-            <div
-              aria-hidden
-              className="absolute -top-20 -right-16 w-72 h-72 rounded-full opacity-40 blur-3xl bg-violet-500"
-            />
-            <div
-              aria-hidden
-              className="absolute -bottom-20 -left-16 w-60 h-60 rounded-full opacity-30 blur-3xl bg-cyan-500"
-            />
+          <div className="relative overflow-hidden rounded-2xl border border-[#E7DED2] p-6 glass-strong">
             <div className="relative flex items-start gap-4">
               <div className="relative flex-shrink-0">
-                <div className="absolute inset-0 rounded-xl bg-violet-500/40 blur-lg" />
-                <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-900/40">
+                <div className="absolute inset-0 rounded-xl bg-[#7F5539]/40 blur-lg" />
+                <div className="relative w-12 h-12 rounded-xl bg-[#7F5539] flex items-center justify-center shadow-[0_4px_12px_rgba(127,85,57,0.25)]">
                   <HelpCircle className="w-6 h-6 text-white" />
                 </div>
               </div>
@@ -38,7 +30,7 @@ export function FAQs() {
                   Can&apos;t find what you&apos;re looking for? Our support team is here to help.
                 </p>
                 <button
-                  className="px-4 py-2 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm shadow-lg shadow-violet-900/40"
+                  className="px-4 py-2 bg-[#7F5539] text-white rounded-lg hover:opacity-90 transition-opacity text-sm shadow-[0_4px_12px_rgba(127,85,57,0.25)]"
                   style={{ fontWeight: 600 }}
                 >
                   Contact Support
@@ -62,17 +54,17 @@ export function FAQs() {
                     <button
                       onClick={() => setOpenIndex(open ? null : index)}
                       className={`w-full flex items-center justify-between p-6 text-left transition-colors ${
-                        open ? "bg-violet-500/10" : "hover:bg-white/[0.03]"
+                        open ? "bg-[#F4ECE3]" : "hover:bg-[#FCF8F3]"
                       }`}
                     >
                       <h4 className="pr-4 flex items-center gap-3">
                         {open && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-violet-400 shadow-[0_0_8px] shadow-violet-400/70" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#B08968]" />
                         )}
                         {faq.question}
                       </h4>
                       {open ? (
-                        <ChevronUp className="w-5 h-5 text-violet-300 flex-shrink-0" />
+                        <ChevronUp className="w-5 h-5 text-[#B08968] flex-shrink-0" />
                       ) : (
                         <ChevronDown className="w-5 h-5 text-muted-foreground flex-shrink-0" />
                       )}
@@ -123,7 +115,7 @@ function QuickLinkCard({ title, body, cta }: { title: string; body: string; cta:
     <GlassCard interactive className="p-6">
       <h4 className="mb-2">{title}</h4>
       <p className="text-sm text-muted-foreground mb-3">{body}</p>
-      <button className="text-sm text-violet-300 hover:text-violet-200 transition-colors" style={{ fontWeight: 600 }}>
+      <button className="text-sm text-[#B08968] hover:text-[#7F5539] transition-colors" style={{ fontWeight: 600 }}>
         {cta}
       </button>
     </GlassCard>
