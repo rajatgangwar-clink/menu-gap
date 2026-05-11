@@ -933,17 +933,26 @@ function buildMenuDishes(data: DashboardData): MenuDish[] {
       existing.priceDelta = r.priceDelta;
       existing.priceLabel = r.label;
       existing.groupSize = r.groupSize;
+      // Backfill rating/reviews from the ranking entry when the performer
+      // list didn't already supply them (or supplied a zero count).
+      if (existing.rating == null && r.rating != null) existing.rating = r.rating;
+      if (existing.reviewCount === 0 && r.reviewCount > 0) {
+        existing.reviewCount = r.reviewCount;
+      }
       if (!existing.name) existing.name = r.name;
     } else {
+      // Pure pricing entry — derive a performance label from rating + review
+      // volume so the dish has a meaningful status instead of "Average".
+      const label = inferPerformanceLabel(r.rating, r.reviewCount);
       map.set(r.menuItemId, {
         menuItemId: r.menuItemId,
         name: r.name,
         rank: 0,
-        rating: null,
-        reviewCount: 0,
-        performanceScore: 0,
-        performanceLabel: null,
-        status: "Average",
+        rating: r.rating,
+        reviewCount: r.reviewCount,
+        performanceScore: performanceScoreFromLabel(label),
+        performanceLabel: label,
+        status: labelToStatus(label),
         yourPrice: r.price,
         avgGroupPrice: r.avgGroupPrice,
         priceDelta: r.priceDelta,
@@ -957,6 +966,32 @@ function buildMenuDishes(data: DashboardData): MenuDish[] {
     (a, b) => b.performanceScore - a.performanceScore
   );
   return sorted.map((d, idx) => ({ ...d, rank: idx + 1 }));
+}
+
+// When a dish only appears in dish_rankings (no best/worst performer entry),
+// we still know its rating and review count — bucket those into a label so
+// the dish doesn't render as "Not rated" when the data is actually present.
+function inferPerformanceLabel(
+  rating: number | null,
+  reviewCount: number
+): PerformanceLabel | null {
+  if (rating == null || reviewCount === 0) return null;
+  if (rating >= 4.5 && reviewCount >= 50) return "Top Performer";
+  if (rating < 3.5) return "Needs Attention";
+  return "Reliable Item";
+}
+
+function performanceScoreFromLabel(label: PerformanceLabel | null): number {
+  switch (label) {
+    case "Top Performer":
+      return 0.9;
+    case "Reliable Item":
+      return 0.65;
+    case "Needs Attention":
+      return 0.25;
+    default:
+      return 0;
+  }
 }
 
 function labelToStatus(label: PerformanceLabel | null): PerformanceStatus {

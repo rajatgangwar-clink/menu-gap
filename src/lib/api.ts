@@ -245,6 +245,7 @@ function scoreFromReadiness(
 }
 
 function normalizeDishRanking(d: ApiDashboardResponse["dish_rankings"][number]): DishRanking {
+  const ratingRaw = typeof d.rating === "string" ? parseFloat(d.rating) : null;
   return {
     menuItemId: d.menu_item_id,
     name: d.name,
@@ -253,6 +254,8 @@ function normalizeDishRanking(d: ApiDashboardResponse["dish_rankings"][number]):
     price: parseFloat(d.price),
     avgGroupPrice: d.avg_group_price,
     priceDelta: d.price_delta,
+    rating: ratingRaw != null && Number.isFinite(ratingRaw) ? ratingRaw : null,
+    reviewCount: typeof d.review_count === "number" ? d.review_count : 0,
     label: d.label,
     rank: d.rank,
     groupSize: d.group_size,

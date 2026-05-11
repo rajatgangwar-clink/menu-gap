@@ -73,6 +73,8 @@ export interface ApiDishRanking {
   price: string;
   avg_group_price: number;
   price_delta: number;
+  rating?: string;
+  review_count?: number;
   label: PriceLabel;
   rank: number;
   group_size: number;
@@ -156,6 +158,8 @@ export interface DishRanking {
   price: number;
   avgGroupPrice: number;
   priceDelta: number;
+  rating: number | null;
+  reviewCount: number;
   label: PriceLabel;
   rank: number;
   groupSize: number;
